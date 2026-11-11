@@ -66,3 +66,58 @@ p{
     background-color: #62A1D6;
     color: #dfdfdf;
 }
+
+
+
+
+.top_of_the_camera,
+.bottom_of_the_camera {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.top_of_the_camera {
+    align-items: flex-start;
+}
+
+.bottom_of_the_camera {
+    align-items: flex-end;
+}
+
+.left_camera_info,
+.right_camera_info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6vh;
+}
+
+.right_camera_info {
+    text-align: right;
+}
+
+.left_camera_info p,
+.right_camera_info p {
+    background: rgba(17, 24, 32, 0.75);
+    border-left: 0.2vw solid #62A1D6;
+    padding: 0.4vh 0.8vw;
+    border-radius: 0.3vw;
+    font-family: monospace;
+    font-size: 1.6vh;
+}
+
+.right_camera_info p {
+    border-left: none;
+    border-right: 0.2vw solid #62A1D6;
+}
+
+[id^="id_camera"] {
+    font-weight: bold;
+    color: #62A1D6;
+}
+
+.camers.TreeXTree .left_camera_info p,
+.camers.TreeXTree .right_camera_info p {
+    font-size: 1.2vh;
+    padding: 0.2vh 0.5vw;
+}

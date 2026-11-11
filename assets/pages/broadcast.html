@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>камеры</title>
+    <title>Камеры</title>
     <link rel="stylesheet" href="../styles/main.css">
 </head>
 <body>
@@ -21,42 +21,182 @@
         </div>
     </div>
 
-    <div class="camers" id="cameraContainer">
-        <div class="camera" id="camera1"></div>
-        <div class="camera" id="camera2"></div>
-        <div class="camera" id="camera3"></div>
-        <div class="camera" id="camera4"></div>
+    <div class="camers window" id="cameraContainer">
+        <!-- Камера 1 -->
+        <div class="camera" id="camera1">
+            <div class="top_of_the_camera">
+                <div class="left_camera_info">
+                    <p id="id_camera1"></p>
+                    <p id="coord_camera1"></p>
+                </div>
+                <div class="right_camera_info">
+                    <p id="height_camera1"></p>
+                    <p id="speed_camera1"></p>
+                    <p id="turn_camera1"></p>
+                </div>
+            </div>
+            <div class="bottom_of_the_camera">
+                <div class="left_camera_info">
+                    <p id="buttary_camera1"></p>
+                    <p id="ping_camera1"></p>
+                </div>
+                <div class="right_camera_info"></div>
+            </div>
+        </div>
+
+        <!-- Камера 2 -->
+        <div class="camera" id="camera2">
+            <div class="top_of_the_camera">
+                <div class="left_camera_info">
+                    <p id="id_camera2"></p>
+                    <p id="coord_camera2"></p>
+                </div>
+                <div class="right_camera_info">
+                    <p id="height_camera2"></p>
+                    <p id="speed_camera2"></p>
+                    <p id="turn_camera2"></p>
+                </div>
+            </div>
+            <div class="bottom_of_the_camera">
+                <div class="left_camera_info">
+                    <p id="buttary_camera2"></p>
+                    <p id="ping_camera2"></p>
+                </div>
+                <div class="right_camera_info"></div>
+            </div>
+        </div>
+
+        <!-- Камера 3 -->
+        <div class="camera" id="camera3">
+            <div class="top_of_the_camera">
+                <div class="left_camera_info">
+                    <p id="id_camera3"></p>
+                    <p id="coord_camera3"></p>
+                </div>
+                <div class="right_camera_info">
+                    <p id="height_camera3"></p>
+                    <p id="speed_camera3"></p>
+                    <p id="turn_camera3"></p>
+                </div>
+            </div>
+            <div class="bottom_of_the_camera">
+                <div class="left_camera_info">
+                    <p id="buttary_camera3"></p>
+                    <p id="ping_camera3"></p>
+                </div>
+                <div class="right_camera_info"></div>
+            </div>
+        </div>
+
+        <!-- Камера 4 -->
+        <div class="camera" id="camera4">
+            <div class="top_of_the_camera">
+                <div class="left_camera_info">
+                    <p id="id_camera4"></p>
+                    <p id="coord_camera4"></p>
+                </div>
+                <div class="right_camera_info">
+                    <p id="height_camera4"></p>
+                    <p id="speed_camera4"></p>
+                    <p id="turn_camera4"></p>
+                </div>
+            </div>
+            <div class="bottom_of_the_camera">
+                <div class="left_camera_info">
+                    <p id="buttary_camera4"></p>
+                    <p id="ping_camera4"></p>
+                </div>
+                <div class="right_camera_info"></div>
+            </div>
+        </div>
     </div>
 </main>
 <footer></footer>
 
 <script>
-    const btn_win = document.getElementById('window');
-    const btn_TwoXTwo = document.getElementById('TwoXTwo');
-    const btn_TreeXTree = document.getElementById('TreeXTree');
-    const container = document.getElementById('cameraContainer');
+        const camerasData = [
+        {
+            "id": "DRONE-01 [СЕВЕР]",
+            "coord": "53.4182° N, 58.9741° E",
+            "height": "Высота: 124 м",
+            "speed": "Скорость: 42 км/ч",
+            "turn": "Курс: 315° (СЗ)",
+            "battery": "Батарея: 88%",
+            "ping": "Пинг: 19 мс"
+        },
+        {
+            "id": "DRONE-02 [ЦЕНТР]",
+            "coord": "53.4071° N, 58.9803° E",
+            "height": "Высота: 85 м",
+            "speed": "Скорость: 12 км/ч",
+            "turn": "Курс: 90° (В)",
+            "battery": "Батарея: 64%",
+            "ping": "Пинг: 27 мс"
+        },
+        {
+            "id": "DRONE-03 [ЮГ-ПРОМ]",
+            "coord": "53.3794° N, 59.0125° E",
+            "height": "Высота: 210 м",
+            "speed": "Скорость: 68 км/ч",
+            "turn": "Курс: 180° (Ю)",
+            "battery": "Батарея: 41%",
+            "ping": "Пинг: 45 мс"
+        },
+        {
+            "id": "DRONE-04 [ЗАПАД]",
+            "coord": "53.4015° N, 58.9310° E",
+            "height": "Высота: 50 м",
+            "speed": "Скорость: 0 км/ч (Зависание)",
+            "turn": "Курс: 260° (З)",
+            "battery": "Батарея: 19% [НИЗКИЙ]",
+            "ping": "Пинг: 62 мс"
+        }
+        ];
 
-    const buttons = [btn_win, btn_TwoXTwo, btn_TreeXTree];
+        const btn_win = document.getElementById('window');
+        const btn_TwoXTwo = document.getElementById('TwoXTwo');
+        const btn_TreeXTree = document.getElementById('TreeXTree');
+        const container = document.getElementById('cameraContainer');
 
-    function setActiveButton(activeBtn) {
+        const buttons = [btn_win, btn_TwoXTwo, btn_TreeXTree];
+
+        function setActiveButton(activeBtn) {
         buttons.forEach(btn => btn.classList.remove('active'));
         activeBtn.classList.add('active');
     }
 
-    btn_win.addEventListener('click', () => {
+        btn_win.addEventListener('click', () => {
         container.className = 'camers window';
         setActiveButton(btn_win);
     });
 
-    btn_TwoXTwo.addEventListener('click', () => {
+        btn_TwoXTwo.addEventListener('click', () => {
         container.className = 'camers TwoXTwo';
         setActiveButton(btn_TwoXTwo);
     });
 
-    btn_TreeXTree.addEventListener('click', () => {
+        btn_TreeXTree.addEventListener('click', () => {
         container.className = 'camers TreeXTree';
         setActiveButton(btn_TreeXTree);
     });
+
+        function updateCamerasData() {
+        camerasData.forEach((cam, index) => {
+            const num = index + 1;
+
+            if (document.getElementById(`camera${num}`)) {
+                document.getElementById(`id_camera${num}`).textContent = cam.id;
+                document.getElementById(`coord_camera${num}`).textContent = cam.coord;
+                document.getElementById(`height_camera${num}`).textContent = cam.height;
+                document.getElementById(`speed_camera${num}`).textContent = cam.speed;
+                document.getElementById(`turn_camera${num}`).textContent = cam.turn;
+                document.getElementById(`buttary_camera${num}`).textContent = cam.battery;
+                document.getElementById(`ping_camera${num}`).textContent = cam.ping;
+            }
+        });
+    }
+
+        updateCamerasData();
 </script>
 </body>
 </html>
