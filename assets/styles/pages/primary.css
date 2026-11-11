@@ -1,0 +1,177 @@
+/* Контейнер карты */
+.map-container {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    background-color: #1a2332;
+    border: 2px solid #2a3a4a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+
+.map-background {
+    width: 100%;
+    height: 100%;
+    background-color: #0f1923;
+    background-image: url('../../img/map.png');
+    background-size: cover; 
+    background-position: center;
+}
+
+
+.drone {
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.drone:hover {
+    transform: scale(1.1);
+}
+
+.drone-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    border: 3px solid #fff;
+    background-color: #030303;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.3s ease; 
+}
+
+
+.drone-icon::before {
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 16px solid #4CAF50; 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+}
+
+.drone-icon::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background-color: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+.drone-info {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: #1a2332;
+    border: 2px solid #2a3a4a;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 100;
+}
+
+.drone-info.active {
+    display: block;
+}
+
+.drone-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #2a3a4a;
+}
+
+.drone-info-header h3 {
+    margin: 0;
+    color: #a9d8ff;
+    font-size: 18px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #a9d8ff;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+    background-color: #2a3a4a;
+}
+
+.drone-info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-label {
+    color: #7a8a9a;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    color: #a9d8ff;
+    font-size: 14px;
+}
+
+
+.battery-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #2a3a4a;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.battery-level {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+
+.status-active {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.status-inactive {
+    color: #f44336;
+    font-weight: bold;
+}

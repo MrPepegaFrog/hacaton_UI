@@ -10,10 +10,45 @@
     <div id="header-placeholder"></div>
     <main>
         <div class="container">
-
+    <div class="map-container">
+        <div class="map-background">
         </div>
+        
+        <div class="drone" id="drone1" style="top: 150px; left: 300px;">
+            <div class="drone-icon"></div>
+        </div>
+        <div class="drone-info" id="droneInfo">
+            <div class="drone-info-header">
+                <h3>Дрон #1</h3>
+                <button class="close-btn" id="closeDroneInfo">✕</button>
+            </div>
+            <div class="drone-info-content">
+                <div class="info-row">
+                    <span class="info-label">Название:</span>
+                    <span class="info-value">DJI Mavic 3</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Заряд:</span>
+                    <div class="battery-bar">
+                        <div class="battery-level" style="width: 75%;"></div>
+                    </div>
+                    <span class="info-value">75%</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Статус:</span>
+                    <span class="info-value status-active">Активен</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Координаты:</span>
+                    <span class="info-value">55.7558° N, 37.6173° E</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     </main>
     <script src="assets/scripts/layout.js"></script>
+    <script src="assets/scripts/map.js"></script>
 
 </body>
 </html>
