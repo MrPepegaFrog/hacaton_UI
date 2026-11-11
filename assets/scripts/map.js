@@ -1,147 +1,454 @@
 
-const DRONE_SIZE = 36;
-const MAP_BOUNDS = { minX: -100, maxX: 100, minZ: -100, maxZ: 100 };
-const SMOOTHING = 0.04;        
-const TURN_SMOOTHING = 0.08;   
-const MIN_SPEED = 0.3;         
+/* =========================================
+   WILDFIRE OPS — MAP CONTROLLER
+   ========================================= */
 
+(() => {
+    'use strict';
 
-let droneData = {
-    id: 'drone1',
-    name: 'DJI Mavic 3',
-    x: 0, z: 0,
-    battery: 75,
-    status: 'active'
-};
+    const DRONE_SIZE = 18;
 
-const canvas = document.getElementById('mapCanvas');
-const ctx = canvas.getContext('2d');
-
-function resizeCanvas() {
-    canvas.width = canvas.parentElement.clientWidth;
-    canvas.height = canvas.parentElement.clientHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-let drawX = 0, drawY = 0;
-let drawHeading = 0;
-let targetHeading = 0;
-let selected = false;
-
-function applyDroneData(data) {
-    if (Array.isArray(data)) data = data[0];
-    if (!data) return;
-    for (const key in data) {
-        droneData[key] = data[key];
-    }
-}
-
-function worldToScreen(x, z) {
-    return {
-        x: ((x - MAP_BOUNDS.minX) / (MAP_BOUNDS.maxX - MAP_BOUNDS.minX)) * canvas.width,
-        y: ((z - MAP_BOUNDS.minZ) / (MAP_BOUNDS.maxZ - MAP_BOUNDS.minZ)) * canvas.height,
+    const MAP_BOUNDS = {
+        minX: -100,
+        maxX: 100,
+        minZ: -100,
+        maxZ: 100
     };
-}
 
-function drawDrone() {
-    const half = DRONE_SIZE / 2;
+    const SMOOTHING = 0.045;
+    const TURN_SMOOTHING = 0.08;
 
-    ctx.save();
-    ctx.translate(drawX, drawY);
-    ctx.rotate(drawHeading * Math.PI / 180);
+    const canvas = document.getElementById('mapCanvas');
+    const mapContainer = document.getElementById('mapContainer');
 
-    // квадрат
-    ctx.fillStyle = selected ? '#12351f' : '#030303';
-    ctx.strokeStyle = selected ? '#4CAF50' : '#ffffff';
-    ctx.lineWidth = 3;
-    ctx.fillRect(-half, -half, DRONE_SIZE, DRONE_SIZE);
-    ctx.strokeRect(-half, -half, DRONE_SIZE, DRONE_SIZE);
+    if (!canvas || !mapContainer) return;
 
-    // нос-стрелка
-    ctx.beginPath();
-    ctx.moveTo(0, -10);
-    ctx.lineTo(8, 6);
-    ctx.lineTo(-8, 6);
-    ctx.closePath();
-    ctx.fillStyle = '#4CAF50';
-    ctx.fill();
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    ctx.restore();
+    // Элементы интерфейса
+    const droneInfo = document.getElementById('droneInfo');
+    const closeDroneInfo = document.getElementById('closeDroneInfo');
 
-    ctx.fillStyle = '#a9d8ff';
-    ctx.font = '12px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(droneData.name, drawX, drawY + half + 16);
-}
+    const infoTitle = document.getElementById('infoTitle');
+    const infoName = document.getElementById('infoName');
+    const infoId = document.getElementById('infoId');
+    const infoStatus = document.getElementById('infoStatus');
+    const infoBattery = document.getElementById('infoBattery');
+    const batteryLevel = document.getElementById('batteryLevel');
+    const infoCoordX = document.getElementById('infoCoordX');
+    const infoCoordZ = document.getElementById('infoCoordZ');
 
+    const zoomIn = document.getElementById('zoomIn');
+    const zoomOut = document.getElementById('zoomOut');
+    const recenterMap = document.getElementById('recenterMap');
 
-function updatePosition() {
-    const target = worldToScreen(droneData.x, droneData.z);
-    const prevX = drawX, prevY = drawY;
+    const metricBattery = document.getElementById('metricBattery');
+    const lastUpdated = document.getElementById('lastUpdated');
 
-    drawX += (target.x - drawX) * SMOOTHING;
-    drawY += (target.y - drawY) * SMOOTHING;
+    // Данные беспилотника
+    const droneData = {
+        id: 'UAV-01',
+        name: 'DJI Mavic 3',
+        model: 'DJI Mavic 3',
+        x: 0,
+        z: 0,
+        battery: 100,
+        status: 'active',
+        heading: 0
+    };
 
-    const vx = drawX - prevX;
-    const vy = drawY - prevY;
-    const speed = Math.hypot(vx, vy);
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+    let pixelRatio = 1;
 
-    if (speed > MIN_SPEED) {
-        targetHeading = Math.atan2(vx, -vy) * 180 / Math.PI;
+    let drawX = 0;
+    let drawY = 0;
+    let drawHeading = 0;
+    let targetHeading = 0;
+
+    let selected = false;
+    let zoom = 1;
+    let animationFrame = null;
+    let mockTimer = null;
+    let time = 0;
+
+    const reducedMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* =====================================
+       CANVAS RESIZE
+       ===================================== */
+
+    function resizeCanvas() {
+        const rect = mapContainer.getBoundingClientRect();
+
+        canvasWidth = Math.max(1, rect.width);
+        canvasHeight = Math.max(1, rect.height);
+
+        pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.round(canvasWidth * pixelRatio);
+        canvas.height = Math.round(canvasHeight * pixelRatio);
+
+        ctx.setTransform(
+            pixelRatio, 0,
+            0, pixelRatio,
+            0, 0
+        );
+
+        if (drawX === 0 && drawY === 0) {
+            const initial = worldToScreen(droneData.x, droneData.z);
+            drawX = initial.x;
+            drawY = initial.y;
+        }
     }
 
-    let dh = targetHeading - drawHeading;
-    if (dh > 180) dh -= 360;
-    if (dh < -180) dh += 360;
-    drawHeading += dh * TURN_SMOOTHING;
-}
-
-function tick() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    updatePosition();
-    drawDrone();
-    requestAnimationFrame(tick);
-}
-
-const initial = worldToScreen(droneData.x, droneData.z);
-drawX = initial.x;
-drawY = initial.y;
-drawHeading = 0;
-tick();
-
-
-canvas.addEventListener('click', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
-    const half = DRONE_SIZE / 2 + 6;
-
-    if (Math.abs(mx - drawX) <= half && Math.abs(my - drawY) <= half) {
-        selected = true;
-        document.getElementById('droneInfo').classList.add('active');
-        document.getElementById('infoTitle').textContent = droneData.name;
-        document.getElementById('infoBattery').textContent = droneData.battery + '%';
-        document.getElementById('batteryLevel').style.width = droneData.battery + '%';
+    if ('ResizeObserver' in window) {
+        const resizeObserver = new ResizeObserver(resizeCanvas);
+        resizeObserver.observe(mapContainer);
     } else {
-        selected = false;
-        document.getElementById('droneInfo').classList.remove('active');
+        window.addEventListener('resize', resizeCanvas);
     }
-});
 
-document.getElementById('closeDroneInfo').addEventListener('click', () => {
-    selected = false;
-    document.getElementById('droneInfo').classList.remove('active');
-});
+    resizeCanvas();
 
+    /* =====================================
+       COORDINATES AND ZOOM
+       ===================================== */
 
-let t = 0;
-function updateMockData() {
-    t += 0.02;
-    applyDroneData({
-        x: Math.sin(t) * 70,          
-        z: Math.sin(t * 2) * 40,       
-        battery: 75 - (t % 60) * 0.3,  
+    function worldToScreen(x, z) {
+        const normalizedX =
+            (x - MAP_BOUNDS.minX) /
+            (MAP_BOUNDS.maxX - MAP_BOUNDS.minX);
+
+        const normalizedZ =
+            (z - MAP_BOUNDS.minZ) /
+            (MAP_BOUNDS.maxZ - MAP_BOUNDS.minZ);
+
+        const centerX = canvasWidth / 2;
+        const centerY = canvasHeight / 2;
+
+        return {
+            x: centerX + (normalizedX * canvasWidth - centerX) * zoom,
+            y: centerY + (normalizedZ * canvasHeight - centerY) * zoom
+        };
+    }
+
+    function setZoom(value) {
+        zoom = Math.max(1, Math.min(2.5, value));
+        draw();
+    }
+
+    zoomIn?.addEventListener('click', () => {
+        setZoom(zoom + 0.2);
     });
-}
-setInterval(updateMockData, 50);  
+
+    zoomOut?.addEventListener('click', () => {
+        setZoom(zoom - 0.2);
+    });
+
+    recenterMap?.addEventListener('click', () => {
+        zoom = 1;
+        droneData.x = 0;
+        droneData.z = 0;
+
+        drawX = canvasWidth / 2;
+        drawY = canvasHeight / 2;
+
+        draw();
+    });
+
+    /* =====================================
+       DRONE POSITION
+       ===================================== */
+
+    function updatePosition() {
+        const target = worldToScreen(droneData.x, droneData.z);
+
+        const previousX = drawX;
+        const previousY = drawY;
+
+        if (reducedMotion) {
+            drawX = target.x;
+            drawY = target.y;
+        } else {
+            drawX += (target.x - drawX) * SMOOTHING;
+            drawY += (target.y - drawY) * SMOOTHING;
+        }
+
+        const velocityX = drawX - previousX;
+        const velocityY = drawY - previousY;
+
+        if (Math.hypot(velocityX, velocityY) > 0.1) {
+            targetHeading =
+                Math.atan2(velocityX, -velocityY);
+        }
+
+        let difference = targetHeading - drawHeading;
+
+        while (difference > Math.PI) {
+            difference -= Math.PI * 2;
+        }
+
+        while (difference < -Math.PI) {
+            difference += Math.PI * 2;
+        }
+
+        drawHeading += difference * TURN_SMOOTHING;
+    }
+
+    /* =====================================
+       DRAW DRONE
+       ===================================== */
+
+    function drawDrone() {
+        const size = DRONE_SIZE;
+
+        ctx.save();
+
+        ctx.translate(drawX, drawY);
+        ctx.rotate(drawHeading);
+
+        // Свечение выбранного аппарата
+        if (selected) {
+            ctx.beginPath();
+            ctx.arc(0, 0, 30, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(212, 155, 75, 0.15)';
+            ctx.fill();
+        }
+
+        // Корпус
+        ctx.fillStyle = selected ? '#d49b4b' : '#17232c';
+        ctx.strokeStyle = '#f1bd69';
+        ctx.lineWidth = 2;
+
+        ctx.fillRect(-size, -size, size * 2, size * 2);
+        ctx.strokeRect(-size, -size, size * 2, size * 2);
+
+        // Направление полёта
+        ctx.beginPath();
+        ctx.moveTo(0, -12);
+        ctx.lineTo(8, 7);
+        ctx.lineTo(0, 3);
+        ctx.lineTo(-8, 7);
+        ctx.closePath();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        // Лучи корпуса
+        ctx.strokeStyle = '#d49b4b';
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.moveTo(-size, -size);
+        ctx.lineTo(-size - 7, -size - 7);
+
+        ctx.moveTo(size, -size);
+        ctx.lineTo(size + 7, -size - 7);
+
+        ctx.moveTo(-size, size);
+        ctx.lineTo(-size - 7, size + 7);
+
+        ctx.moveTo(size, size);
+        ctx.lineTo(size + 7, size + 7);
+
+        ctx.stroke();
+
+        ctx.restore();
+
+        // Подпись
+        ctx.save();
+        ctx.fillStyle = '#edf2f5';
+        ctx.font = '12px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+
+        ctx.fillText(
+            droneData.id,
+            drawX,
+            drawY + 27
+        );
+
+        ctx.restore();
+    }
+
+    /* =====================================
+       UPDATE DRONE INFORMATION
+       ===================================== */
+
+    function updateDroneInfo() {
+        if (!droneInfo) return;
+
+        const battery = Math.max(
+            0,
+            Math.min(100, Math.round(droneData.battery))
+        );
+
+        const statusText = droneData.status === 'active'
+            ? 'В ПОЛЁТЕ'
+            : 'НА БАЗЕ';
+
+        if (infoTitle) infoTitle.textContent = 'Информация о БПЛА';
+        if (infoName) infoName.textContent = droneData.name;
+        if (infoId) infoId.textContent = 'ID: ' + droneData.id;
+        if (infoStatus) infoStatus.textContent = statusText;
+        if (infoBattery) infoBattery.textContent = battery + '%';
+
+        if (batteryLevel) {
+            batteryLevel.style.width = battery + '%';
+
+            batteryLevel.classList.toggle('warning', battery <= 50);
+            batteryLevel.classList.toggle('danger', battery <= 20);
+        }
+
+        if (infoCoordX) {
+            infoCoordX.textContent = droneData.x.toFixed(1);
+        }
+
+        if (infoCoordZ) {
+            infoCoordZ.textContent = droneData.z.toFixed(1);
+        }
+    }
+
+    function openDroneInfo() {
+        selected = true;
+
+        updateDroneInfo();
+
+        if (droneInfo) {
+            droneInfo.setAttribute('aria-hidden', 'false');
+        }
+
+        draw();
+    }
+
+    function closeInfo() {
+        selected = false;
+
+        if (droneInfo) {
+            droneInfo.setAttribute('aria-hidden', 'true');
+        }
+
+        draw();
+    }
+
+    closeDroneInfo?.addEventListener('click', closeInfo);
+
+    /* =====================================
+       CANVAS CLICK
+       ===================================== */
+
+    canvas.addEventListener('click', (event) => {
+        const rect = canvas.getBoundingClientRect();
+
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+
+        const hitRadius = DRONE_SIZE + 12;
+
+        const distance = Math.hypot(
+            mouseX - drawX,
+            mouseY - drawY
+        );
+
+        if (distance <= hitRadius) {
+            openDroneInfo();
+        } else {
+            closeInfo();
+        }
+    });
+    canvas.addEventListener('mousemove', (event) => {
+        const rect = canvas.getBoundingClientRect();
+
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+
+        const { x, y } = worldToScreen(droneData.x, droneData.z);
+
+        const distance = Math.hypot(mouseX - x, mouseY - y);
+
+        canvas.classList.toggle('drone-hover', distance < 25);
+    });
+
+    /* =====================================
+       MAP DRAWING
+       ===================================== */
+
+    function draw() {
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+        updatePosition();
+        drawDrone();
+    }
+
+    function animate() {
+        draw();
+
+        if (!reducedMotion) {
+            animationFrame = requestAnimationFrame(animate);
+        }
+    }
+
+    /* =====================================
+       DEMO TELEMETRY
+       ===================================== */
+
+    function updateMockData() {
+        time += 0.02;
+
+        droneData.x = Math.sin(time) * 70;
+        droneData.z = Math.sin(time * 2) * 40;
+
+        droneData.battery = Math.max(
+            10,
+            75 - (time % 60) * 0.3
+        );
+
+        if (metricBattery) {
+            metricBattery.textContent =
+                Math.round(droneData.battery);
+        }
+
+        if (lastUpdated) {
+            lastUpdated.textContent =
+                new Date().toLocaleTimeString('ru-RU');
+        }
+
+        if (selected) {
+            updateDroneInfo();
+        }
+
+        if (reducedMotion) {
+            draw();
+        }
+    }
+
+    /* =====================================
+       START
+       ===================================== */
+
+    drawX = canvasWidth / 2;
+    drawY = canvasHeight / 2;
+
+    if (reducedMotion) {
+        draw();
+    } else {
+        animate();
+    }
+
+    mockTimer = window.setInterval(updateMockData, 100);
+
+    // Очистка при выгрузке страницы
+    window.addEventListener('pagehide', () => {
+        if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+        }
+
+        if (mockTimer) {
+            clearInterval(mockTimer);
+        }
+    });
+
+})();

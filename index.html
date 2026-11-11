@@ -1,47 +1,254 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="theme-color" content="#0d141c">
+    <title>WILDFIRE OPS | Центр мониторинга</title>
+
     <link rel="stylesheet" href="assets/styles/main.css">
 </head>
 <body>
+
     <div id="header-placeholder"></div>
-    <main>
-        <div class="container">
-    <div class="map-container">
-    <canvas id="mapCanvas"></canvas>
-    <div class="drone-info" id="droneInfo">
-        <div class="drone-info-header">
-            <h3 id="infoTitle">Дрон</h3>
-            <button class="close-btn" id="closeDroneInfo">✕</button>
-        </div>
-        <div class="drone-info-content">
-            <div class="info-row">
-                <span class="info-label">Название:</span>
-                <span class="info-value" id="infoName">—</span>
+
+    <main class="page-shell">
+
+        <!-- Заголовок -->
+        <section class="page-heading">
+            <div>
+                <p class="eyebrow">WILDFIRE OPS / CONTROL CENTER</p>
+                <h1>Мониторинг лесных пожаров</h1>
+                <p class="page-description">
+                    Оперативная обстановка и управление беспилотной группировкой
+                </p>
             </div>
-            <div class="info-row">
-                <span class="info-label">Заряд:</span>
-                <div class="battery-bar"><div class="battery-level" id="batteryLevel"></div></div>
-                <span class="info-value" id="infoBattery">—</span>
+
+            <div class="system-state">
+                <span class="state-indicator"></span>
+                <span>Система активна</span>
+                <span class="state-divider"></span>
+                <time id="lastUpdated">—</time>
             </div>
-            <div class="info-row">
-                <span class="info-label">Статус:</span>
-                <span class="info-value" id="infoStatus">—</span>
+        </section>
+
+        <!-- Статистика -->
+        <section class="metrics-grid">
+
+            <article class="metric-card">
+                <span class="metric-label">Беспилотники</span>
+                <div class="metric-value" id="metricTotal">01</div>
+                <span class="metric-footnote">Всего в группировке</span>
+            </article>
+
+            <article class="metric-card">
+                <span class="metric-label">Активные полёты</span>
+                <div class="metric-value" id="metricFlying">01</div>
+                <span class="metric-footnote status-green">На задании</span>
+            </article>
+
+            <article class="metric-card">
+                <span class="metric-label">Обнаруженные пожары</span>
+                <div class="metric-value" id="metricIncidents">03</div>
+                <span class="metric-footnote status-warning">Требуют внимания</span>
+            </article>
+
+            <article class="metric-card">
+                <span class="metric-label">Средний заряд</span>
+                <div class="metric-value">
+                    <span id="metricBattery">75</span>%
+                </div>
+                <span class="metric-footnote">По доступным аппаратам</span>
+            </article>
+
+        </section>
+
+        <!-- Карта -->
+        <section class="map-section">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Оперативная карта</h2>
+                    <p>Мониторинг пожарной обстановки в режиме реального времени</p>
+                </div>
+
+                <span class="live-label">
+                    <span class="live-pulse"></span>
+                    LIVE MONITORING
+                </span>
             </div>
-            <div class="info-row">
-                <span class="info-label">Координаты:</span>
-                <span class="info-value" id="infoCoords">—</span>
+
+            <div class="map-container" id="mapContainer">
+
+                <canvas
+                    id="mapCanvas"
+                    aria-label="Оперативная карта с расположением беспилотников и очагов пожара"
+                    role="img">
+                </canvas>
+
+                <!-- Информация о зоне -->
+                <div class="map-overlay map-overlay--top-left">
+                    <span class="map-coordinate-label">ОПЕРАТИВНЫЙ СЕКТОР</span>
+                    <strong>FOREST ZONE / 01</strong>
+                </div>
+
+                <!-- Легенда -->
+                <div class="map-legend">
+                    <span>
+                        <i class="legend-marker legend-marker--drone"></i>
+                        Беспилотник
+                    </span>
+                    <span>
+                        <i class="legend-marker legend-marker--fire"></i>
+                        Очаг пожара
+                    </span>
+                    <span>
+                        <i class="legend-marker legend-marker--base"></i>
+                        База
+                    </span>
+                </div>
+
+                <!-- Карточка дрона -->
+                <aside class="drone-info" id="droneInfo" aria-hidden="true">
+
+                    <div class="drone-info-header">
+                        <div>
+                            <span class="panel-eyebrow">AIRCRAFT INFORMATION</span>
+                            <h3 id="infoTitle">Беспилотник</h3>
+                        </div>
+
+                        <button
+                            class="close-btn"
+                            id="closeDroneInfo"
+                            type="button"
+                            aria-label="Закрыть">×</button>
+                    </div>
+
+                    <div class="drone-identity">
+                        <div class="drone-identity-mark">UAV</div>
+
+                        <div>
+                            <strong id="infoName">—</strong>
+                            <span id="infoId">ID: —</span>
+                        </div>
+
+                        <span class="object-status" id="infoStatus">
+                            В ПОЛЁТЕ
+                        </span>
+                    </div>
+
+                    <div class="info-block">
+                        <div class="info-row">
+                            <span class="info-label">Уровень заряда</span>
+                            <strong class="info-value" id="infoBattery">—</strong>
+                        </div>
+
+                        <div class="battery-bar">
+                            <div class="battery-level" id="batteryLevel"></div>
+                        </div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-cell">
+                            <span class="info-label">Координата X</span>
+                            <strong id="infoCoordX">—</strong>
+                        </div>
+
+                        <div class="info-cell">
+                            <span class="info-label">Координата Z</span>
+                            <strong id="infoCoordZ">—</strong>
+                        </div>
+                    </div>
+
+                </aside>
+
+                <!-- Управление картой -->
+                <div class="map-controls">
+                    <button id="zoomIn" type="button" aria-label="Увеличить">+</button>
+                    <button id="zoomOut" type="button" aria-label="Уменьшить">−</button>
+                    <button id="recenterMap" type="button" aria-label="Центрировать">◎</button>
+                </div>
+
             </div>
-        </div>
-    </div>
-</div>
-</div>
+        </section>
+
+        <!-- Нижние информационные блоки -->
+        <section class="bottom-grid">
+
+            <article class="information-card">
+                <div class="card-heading">
+                    <div>
+                        <h2>Пожарная обстановка</h2>
+                        <p>Состояние зарегистрированных инцидентов</p>
+                    </div>
+                </div>
+
+                <div class="fleet-row">
+                    <span>Критические очаги</span>
+                    <strong class="status-danger">01</strong>
+                </div>
+
+                <div class="fleet-row">
+                    <span>Очаги под наблюдением</span>
+                    <strong class="status-warning">02</strong>
+                </div>
+
+                <div class="fleet-row">
+                    <span>Локализованные очаги</span>
+                    <strong class="status-green">00</strong>
+                </div>
+            </article>
+
+            <article class="information-card">
+                <div class="card-heading">
+                    <div>
+                        <h2>Последние события</h2>
+                        <p>Оперативная лента системы</p>
+                    </div>
+                </div>
+
+                <div class="event-entry">
+                    <span class="event-marker event-marker--danger"></span>
+
+                    <div>
+                        <strong>Обнаружен новый очаг возгорания</strong>
+                        <p>Сектор FOREST ZONE / 01 · AI Detection</p>
+                    </div>
+
+                    <time>14:32</time>
+                </div>
+
+                <div class="event-entry">
+                    <span class="event-marker event-marker--green"></span>
+
+                    <div>
+                        <strong>Беспилотник начал разведку</strong>
+                        <p>UAV-01 · Mission assigned</p>
+                    </div>
+
+                    <time>14:28</time>
+                </div>
+
+                <div class="event-entry">
+                    <span class="event-marker event-marker--warning"></span>
+
+                    <div>
+                        <strong>Обновлены данные телеметрии</strong>
+                        <p>UAV-03 · Battery status</p>
+                    </div>
+
+                    <time>14:25</time>
+                </div>
+
+            </article>
+
+        </section>
+
     </main>
-    <script src="assets/scripts/layout.js"></script>
-    <script src="assets/scripts/map.js"></script>
+
+    <script src="assets/scripts/layout.js" defer></script>
+    <script src="assets/scripts/map.js" defer></script>
 
 </body>
 </html>

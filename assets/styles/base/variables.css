@@ -1,4 +1,141 @@
-:root{
-    --background: #111820;
-    --color: #d6d6d6;
+
+:root {
+  /* ========================================
+     WILDFIRE OPS — DESIGN TOKENS
+     ======================================== */
+
+  /* Backgrounds */
+  --bg-main: #101820;
+  --bg-secondary: #151f29;
+  --bg-panel: #1b2733;
+  --bg-panel-hover: #22313e;
+  --bg-input: #111b24;
+
+  /* Borders */
+  --border-color: #2b3946;
+  --border-light: #354554;
+
+  /* Text */
+  --text-primary: #edf2f5;
+  --text-secondary: #a5b1bb;
+  --text-muted: #71808d;
+
+  /* Status colors */
+  --color-success: #4caf83;
+  --color-warning: #e4a84f;
+  --color-danger: #e05c5c;
+  --color-info: #5b9bd5;
+
+  /* Map colors */
+  --map-background: #17251f;
+  --map-grid: rgba(185, 205, 190, 0.08);
+  --map-forest: #263d32;
+  --map-fire: #ef684d;
+  --map-fire-glow: rgba(239, 104, 77, 0.2);
+  --map-drone: #e4b45e;
+
+  /* Accent */
+  --accent-primary: #d49b4b;
+  --accent-hover: #e3ad60;
+  --accent-soft: rgba(212, 155, 75, 0.12);
+
+  /* Typography */
+  --font-main: "Inter", "Segoe UI", Arial, sans-serif;
+  --font-monospace: "Consolas", "Courier New", monospace;
+
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 17px;
+  --font-size-xl: 22px;
+  --font-size-title: 28px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  /* Shadows */
+  --shadow-panel: 0 8px 24px rgba(0, 0, 0, 0.22);
+  --shadow-overlay: 0 12px 36px rgba(0, 0, 0, 0.35);
+
+  /* Layout */
+  --header-height: 64px;
+  --content-max-width: 1600px;
+  --sidebar-width: 320px;
+
+  /* Animation */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+
+  /* Layers */
+  --z-map: 1;
+  --z-map-controls: 5;
+  --z-panel: 10;
+  --z-header: 20;
+  --z-overlay: 100;
+}
+
+/* Basic reset */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: var(--font-main);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  background: var(--bg-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Consistent controls */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
