@@ -32,19 +32,32 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     padding: 12px;
     border-bottom: 1px solid #263340;
 }
 .icon-button{
-    margin-left: -80%;
+    display: flex;
+    justify-content: center;    
+    align-items: center;
+    height: 35px;
+    width: 40px;
+    padding: 0;
+
+}
+.container-btn{
+    display: flex;
+    gap: 10px;
 }
 .export-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: #203247;
     color: white;
     border: 1px solid #40566c;
     border-radius: 5px;
-    padding: 7px 12px;
+    width: 200px;
+    height: 30px;
     cursor: pointer;
 }
 .filters {
