@@ -5,6 +5,5 @@
 
 @import "pages/broadcast.css";
 @import "pages/journal.css";
-@import "pages/login.css";
+@import "pages/auth.css";
 @import "pages/primary.css";
-@import "pages/registration.css";

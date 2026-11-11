@@ -3,38 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>камеры</title>
+    <meta name="theme-color" content="#101820">
+    <title>Регистрация | WILDFIRE OPS</title>
+
     <link rel="stylesheet" href="../styles/main.css">
 </head>
-<body>
-<header></header>
-<main>
-    <div class="login_conteiner">
-        <div class="login">
-            <form id="loginForm">
-                <div class="main_text"><h1>Регистрация</h1></div>
+<body class="auth-page">
 
-                <label for="FullName">Задайте ФИО</label>
-                <input type="text" placeholder="Логин" id="FullName">
+    <main class="auth-main">
+        <section class="auth-card">
+            <div class="auth-brand">
+                <div class="auth-brand-icon">W</div>
+                <span>WILDFIRE <strong>OPS</strong></span>
+            </div>
 
-                <label for="Login">Задайте логин</label>
-                <input type="text" placeholder="Логин" id="Login">
+            <div class="auth-heading">
+                <span class="auth-eyebrow">СОЗДАНИЕ АККАУНТА</span>
+                <h1>Регистрация</h1>
+                <p>Создайте учётную запись для доступа к системе мониторинга.</p>
+            </div>
 
-                <label for="Password">Задайте пароль</label>
-                <input type="password" placeholder="Пароль" id="Password">
+            <form id="registerForm" class="auth-form">
+                <div class="auth-field">
+                    <label for="fullName">ФИО</label>
+                    <input
+                        type="text"
+                        id="fullName"
+                        name="fullName"
+                        placeholder="Иванов Иван Иванович"
+                        autocomplete="name"
+                        minlength="2"
+                        maxlength="100"
+                        required
+                    >
+                </div>
 
-                <label for="NewPassword">Повторите пароль</label>
-                <input type="password" placeholder="Повторный пароль" id="NewPassword">
+                <div class="auth-field">
+                    <label for="registerLogin">Логин</label>
+                    <input
+                        type="text"
+                        id="registerLogin"
+                        name="login"
+                        placeholder="Придумайте логин"
+                        autocomplete="username"
+                        minlength="3"
+                        maxlength="30"
+                        required
+                    >
+                </div>
 
-                <button type="submit">Зарегистрироваться</button>
+                <div class="auth-field">
+                    <label for="registerPassword">Пароль</label>
+                    <input
+                        type="password"
+                        id="registerPassword"
+                        name="password"
+                        placeholder="Минимум 8 символов"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label for="confirmPassword">Повторите пароль</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        placeholder="Введите пароль ещё раз"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <p class="auth-message" id="authMessage" role="alert" aria-live="polite"></p>
+
+                <button class="auth-button" type="submit">
+                    Зарегистрироваться
+                    <span aria-hidden="true">→</span>
+                </button>
             </form>
-        </div>
-    </div>
-</main>
-<footer></footer>
 
-<script>
+            <div class="auth-footer">
+                Уже есть аккаунт?
+                <a href="login.html">Войти</a>
+            </div>
+        </section>
 
-</script>
+        <p class="auth-copyright">WILDFIRE OPS · СИСТЕМА МОНИТОРИНГА БПЛА</p>
+    </main>
+
+    <script src="../scripts/auth.js" defer></script>
 </body>
 </html>

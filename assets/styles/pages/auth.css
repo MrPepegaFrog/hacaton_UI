@@ -1,0 +1,364 @@
+/* =====================================
+   AUTH PAGES — WILDFIRE OPS
+===================================== */
+
+.auth-page {
+    min-height: 100vh;
+    margin: 0;
+    background:
+        radial-gradient(
+            ellipse at 50% 35%,
+            rgba(212, 155, 75, 0.09),
+            transparent 55%
+        ),
+        var(--bg-main, #101820);
+
+    color: var(--text-primary, #edf2f5);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Основной контейнер */
+
+.auth-main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px 20px;
+    box-sizing: border-box;
+}
+
+/* Карточка */
+
+.auth-card {
+    width: 100%;
+    max-width: 460px;
+    box-sizing: border-box;
+    padding: 38px 42px;
+
+    background: var(--bg-panel, #1b2733);
+    border: 1px solid var(--border-color, #2b3946);
+    border-radius: 12px;
+
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.28);
+}
+
+.auth-card-login {
+    max-width: 430px;
+}
+
+/* Логотип */
+
+.auth-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    margin-bottom: 36px;
+
+    color: var(--text-primary, #edf2f5);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.auth-brand strong {
+    color: var(--accent, #d49b4b);
+}
+
+.auth-brand-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--accent, #d49b4b);
+    border-radius: 8px;
+
+    color: #101820;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+/* Заголовок */
+
+.auth-heading {
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.auth-eyebrow {
+    color: var(--accent, #d49b4b);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.auth-heading h1 {
+    margin: 12px 0 10px;
+    color: var(--text-primary, #edf2f5);
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.auth-heading p {
+    margin: 0;
+    color: var(--text-secondary, #a5b1bb);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* Форма */
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 19px;
+}
+
+.auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.auth-field label {
+    color: var(--text-secondary, #a5b1bb);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.auth-field input {
+    width: 100%;
+    min-height: 46px;
+    box-sizing: border-box;
+
+    padding: 0 14px;
+
+    background: var(--bg-input, #111b24);
+    border: 1px solid var(--border-light, #354554);
+    border-radius: 6px;
+    outline: none;
+
+    color: var(--text-primary, #edf2f5);
+    font-family: inherit;
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.auth-field input::placeholder {
+    color: var(--text-muted, #71808d);
+}
+
+.auth-field input:hover {
+    border-color: var(--text-muted, #71808d);
+}
+
+.auth-field input:focus {
+    border-color: var(--accent, #d49b4b);
+    box-shadow: 0 0 0 3px rgba(212, 155, 75, 0.12);
+}
+
+.auth-field input:focus-visible {
+    outline: 2px solid transparent;
+}
+
+/* Сообщения */
+
+.auth-message {
+    display: none;
+    margin: -4px 0 0;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.auth-message.error {
+    display: block;
+    color: #ff9999;
+    background: rgba(224, 92, 92, 0.1);
+    border: 1px solid rgba(224, 92, 92, 0.3);
+}
+
+.auth-message.success {
+    display: block;
+    color: #83d6ad;
+    background: rgba(76, 175, 131, 0.1);
+    border: 1px solid rgba(76, 175, 131, 0.3);
+}
+
+/* Кнопка */
+
+.auth-button {
+    width: 100%;
+    min-height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    margin-top: 5px;
+    padding: 12px 18px;
+
+    background: var(--accent, #d49b4b);
+    border: 1px solid var(--accent, #d49b4b);
+    border-radius: 6px;
+
+    color: #101820;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.auth-button span {
+    font-size: 19px;
+}
+
+.auth-button:hover {
+    background: #e3ad61;
+    box-shadow: 0 5px 18px rgba(212, 155, 75, 0.2);
+}
+
+.auth-button:active {
+    transform: translateY(1px);
+}
+
+.auth-button:focus-visible {
+    outline: 2px solid var(--text-primary, #edf2f5);
+    outline-offset: 3px;
+}
+
+/* Ссылка между страницами */
+
+.auth-footer {
+    margin-top: 27px;
+    padding-top: 20px;
+
+    border-top: 1px solid var(--border-color, #2b3946);
+
+    color: var(--text-secondary, #a5b1bb);
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.auth-footer a {
+    margin-left: 5px;
+
+    color: var(--accent, #d49b4b);
+    font-weight: 700;
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+}
+
+.auth-footer a:hover {
+    color: #e3ad61;
+    text-decoration: underline;
+}
+
+/* Нижняя подпись */
+
+.auth-copyright {
+    margin: 24px 0 0;
+
+    color: var(--text-muted, #71808d);
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-align: center;
+}
+
+/* =====================================
+   АДАПТИВНОСТЬ
+===================================== */
+
+@media (max-width: 600px) {
+    .auth-main {
+        justify-content: center;
+        padding: 24px 16px;
+    }
+
+    .auth-card {
+        max-width: 100%;
+        padding: 30px 24px;
+        border-radius: 10px;
+    }
+
+    .auth-brand {
+        margin-bottom: 28px;
+        font-size: 16px;
+    }
+
+    .auth-heading h1 {
+        font-size: 26px;
+    }
+
+    .auth-heading p {
+        font-size: 12px;
+    }
+
+    .auth-form {
+        gap: 17px;
+    }
+
+    .auth-field input {
+        min-height: 48px;
+        font-size: 16px;
+    }
+
+    .auth-button {
+        min-height: 50px;
+        font-size: 14px;
+    }
+
+    .auth-copyright {
+        max-width: 280px;
+        font-size: 9px;
+        line-height: 1.6;
+    }
+}
+
+@media (max-width: 360px) {
+    .auth-card {
+        padding: 25px 18px;
+    }
+
+    .auth-heading h1 {
+        font-size: 23px;
+    }
+
+    .auth-brand {
+        font-size: 14px;
+    }
+
+    .auth-footer {
+        font-size: 12px;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-page *,
+    .auth-page *::before,
+    .auth-page *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
