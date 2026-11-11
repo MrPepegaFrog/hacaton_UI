@@ -9,6 +9,11 @@ body {
     font-family: Arial, sans-serif;
     font-size: 13px;
 }
+.header-div{
+    height: 80px;
+    width: 100%;
+    background: #d5dde6;
+}
 .main {
     padding: 47px 10px 10px;
 }
@@ -18,4 +23,143 @@ body {
     border: 1px solid #263340;
     border-radius: 7px;
     min-height: calc(100vh - 57px);
+}
+.panel-h1{
+        font-size: 20px;
+        margin: 0;
+}
+.panel-div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px;
+    border-bottom: 1px solid #263340;
+}
+.icon-button{
+    margin-left: -80%;
+}
+.export-button {
+    background-color: #203247;
+    color: white;
+    border: 1px solid #40566c;
+    border-radius: 5px;
+    padding: 7px 12px;
+    cursor: pointer;
+}
+.filters {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    flex-wrap: wrap;
+}
+
+.filters input,
+.filters select {
+    background-color: #080e15;
+    color: white;
+    border: 1px solid #344352;
+    border-radius: 5px;
+    padding: 7px;
+}
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: #172432;
+    color: #9aa9b8;
+    padding: 10px;
+    text-align: left;
+    font-size: 11px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #263340;
+}
+
+tr:hover {
+    background-color: #192938;
+}
+.panel-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    color: #8997a6;
+}
+.status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Новый */
+.status-new {
+    color: #fa6060;
+    background: rgb(246 59 59 / 0.15);
+}
+
+/* Подтверждён */
+.status-confirmed {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.15);
+}
+
+/* Потушен */
+.status-extinguished {
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.15);
+}
+
+/* Ложное срабатывание */
+.status-false {
+    color: #2879ff;
+    background: rgb(48 124 255 / 0.15);
+}
+/* Проценты AI */
+.ai-score {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.ai-high {
+    color: #4ade80;
+}
+
+.ai-medium {
+    color: #fbbf24;
+}
+
+.ai-low {
+    color: #f87171;
+}
+
+
+.incident-type {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.type-fire {
+    color: rgb(250 47 47 / 0.87);
+    background: rgb(255 0 0 / 0.3);
+}
+
+.type-smoke {
+    color: #ffffff;
+    background: rgb(55 55 55 / 0.62);
 }
