@@ -1,0 +1,21 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background-color: #080e15;
+    color: #d5dde6;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+.main {
+    padding: 47px 10px 10px;
+}
+
+.panel {
+    background-color: #101a25;
+    border: 1px solid #263340;
+    border-radius: 7px;
+    min-height: calc(100vh - 57px);
+}
