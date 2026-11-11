@@ -11,40 +11,36 @@
     <main>
         <div class="container">
     <div class="map-container">
-        <div class="map-background">
+    <!-- Canvas поверх фона карты -->
+    <canvas id="mapCanvas"></canvas>
+
+    <!-- Панель характеристик (теперь динамическая) -->
+    <div class="drone-info" id="droneInfo">
+        <div class="drone-info-header">
+            <h3 id="infoTitle">Дрон</h3>
+            <button class="close-btn" id="closeDroneInfo">✕</button>
         </div>
-        
-        <div class="drone" id="drone1" style="top: 150px; left: 300px;">
-            <div class="drone-icon"></div>
-        </div>
-        <div class="drone-info" id="droneInfo">
-            <div class="drone-info-header">
-                <h3>Дрон #1</h3>
-                <button class="close-btn" id="closeDroneInfo">✕</button>
+        <div class="drone-info-content">
+            <div class="info-row">
+                <span class="info-label">Название:</span>
+                <span class="info-value" id="infoName">—</span>
             </div>
-            <div class="drone-info-content">
-                <div class="info-row">
-                    <span class="info-label">Название:</span>
-                    <span class="info-value">DJI Mavic 3</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Заряд:</span>
-                    <div class="battery-bar">
-                        <div class="battery-level" style="width: 75%;"></div>
-                    </div>
-                    <span class="info-value">75%</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Статус:</span>
-                    <span class="info-value status-active">Активен</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Координаты:</span>
-                    <span class="info-value">55.7558° N, 37.6173° E</span>
-                </div>
+            <div class="info-row">
+                <span class="info-label">Заряд:</span>
+                <div class="battery-bar"><div class="battery-level" id="batteryLevel"></div></div>
+                <span class="info-value" id="infoBattery">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Статус:</span>
+                <span class="info-value" id="infoStatus">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Координаты:</span>
+                <span class="info-value" id="infoCoords">—</span>
             </div>
         </div>
     </div>
+</div>
 </div>
     </main>
     <script src="assets/scripts/layout.js"></script>
