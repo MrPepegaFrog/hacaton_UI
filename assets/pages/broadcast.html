@@ -29,22 +29,26 @@
             <!-- Камера 1 -->
             <div class="camera" id="camera1">
                 <img class="camera-stream" id="stream_camera1" src="" alt="Видеопоток камеры 1">
+
                 <div class="top_of_the_camera">
                     <div class="left_camera_info">
                         <p id="id_camera1"></p>
-                        <p id="coord_camera1"></p>
+                        <p id="coord_camera1" hidden></p>
                     </div>
+
                     <div class="right_camera_info">
                         <p id="height_camera1"></p>
                         <p id="speed_camera1"></p>
                         <p id="turn_camera1"></p>
                     </div>
                 </div>
+
                 <div class="bottom_of_the_camera">
                     <div class="left_camera_info">
                         <p id="buttary_camera1"></p>
                         <p id="ping_camera1"></p>
                     </div>
+
                     <div class="right_camera_info"></div>
                 </div>
             </div>
@@ -118,129 +122,9 @@
     </main>
     <footer></footer>
 
-    <script>
-        const img = document.getElementById('stream_camera1');
-        const ws = new WebSocket('ws://192.168.0.115:3000/video?role=viewer');
-
-        ws.binaryType = 'arraybuffer';
-
-        let previousObjectUrl = null;
-
-        ws.onopen = () => {
-            console.log('Connected to drone camera stream');
-        };
-
-        ws.onmessage = (event) => {
-            const blob = new Blob([event.data], { type: 'image/jpeg' });
-            const objectUrl = URL.createObjectURL(blob);
-
-            img.onload = () => {
-                if (previousObjectUrl) {
-                    URL.revokeObjectURL(previousObjectUrl);
-                }
-                previousObjectUrl = objectUrl;
-            };
-
-            img.src = objectUrl;
-        };
-
-        ws.onerror = (error) => {
-            console.error('WebSocket error', error);
-        };
-
-        ws.onclose = () => {
-            console.log('WebSocket closed');
-        };
-
-        //
-
-
-        const camerasData = [
-            {
-                "id": "DRONE-01 [СЕВЕР]",
-                "coord": "53.4182° N, 58.9741° E",
-                "height": "Высота: 124 м",
-                "speed": "Скорость: 42 км/ч",
-                "turn": "Курс: 315° (СЗ)",
-                "battery": "Батарея: 88%",
-                "ping": "Пинг: 19 мс"
-            },
-            {
-                "id": "DRONE-02 [ЦЕНТР]",
-                "coord": "53.4071° N, 58.9803° E",
-                "height": "Высота: 85 м",
-                "speed": "Скорость: 12 км/ч",
-                "turn": "Курс: 90° (В)",
-                "battery": "Батарея: 64%",
-                "ping": "Пинг: 27 мс"
-            },
-            {
-                "id": "DRONE-03 [ЮГ-ПРОМ]",
-                "coord": "53.3794° N, 59.0125° E",
-                "height": "Высота: 210 м",
-                "speed": "Скорость: 68 км/ч",
-                "turn": "Курс: 180° (Ю)",
-                "battery": "Батарея: 41%",
-                "ping": "Пинг: 45 мс"
-            },
-            {
-                "id": "DRONE-04 [ЗАПАД]",
-                "coord": "53.4015° N, 58.9310° E",
-                "height": "Высота: 50 м",
-                "speed": "Скорость: 0 км/ч (Зависание)",
-                "turn": "Курс: 260° (З)",
-                "battery": "Батарея: 19% [НИЗКИЙ]",
-                "ping": "Пинг: 62 мс"
-            }
-        ];
-
-        const btn_win = document.getElementById('window');
-        const btn_TwoXTwo = document.getElementById('TwoXTwo');
-        const btn_TreeXTree = document.getElementById('TreeXTree');
-        const container = document.getElementById('cameraContainer');
-
-        const buttons = [btn_win, btn_TwoXTwo, btn_TreeXTree];
-
-        function setActiveButton(activeBtn) {
-            buttons.forEach(btn => btn.classList.remove('active'));
-            activeBtn.classList.add('active');
-        }
-
-        btn_win.addEventListener('click', () => {
-            container.className = 'camers window';
-            setActiveButton(btn_win);
-        });
-
-        btn_TwoXTwo.addEventListener('click', () => {
-            container.className = 'camers TwoXTwo';
-            setActiveButton(btn_TwoXTwo);
-        });
-
-        btn_TreeXTree.addEventListener('click', () => {
-            container.className = 'camers TreeXTree';
-            setActiveButton(btn_TreeXTree);
-        });
-
-        function updateCamerasData() {
-            camerasData.forEach((cam, index) => {
-                const num = index + 1;
-
-                if (document.getElementById(`camera${num}`)) {
-                    document.getElementById(`id_camera${num}`).textContent = cam.id;
-                    document.getElementById(`coord_camera${num}`).textContent = cam.coord;
-                    document.getElementById(`height_camera${num}`).textContent = cam.height;
-                    document.getElementById(`speed_camera${num}`).textContent = cam.speed;
-                    document.getElementById(`turn_camera${num}`).textContent = cam.turn;
-                    document.getElementById(`buttary_camera${num}`).textContent = cam.battery;
-                    document.getElementById(`ping_camera${num}`).textContent = cam.ping;
-                }
-            });
-        }
-
-        updateCamerasData();
-    </script>
-    <script src="../scripts/layout.js"></script>
-    <script src="../assets/scripts/broadcast.js" defer></script>
+    <script src="../scripts/layout.js" defer></script>
+    <script src="../scripts/telemetry.js" defer></script>
+    <script src="../scripts/broadcast.js" defer></script>
 </body>
 
 </html>
