@@ -96,6 +96,7 @@
     margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 1px solid #2a3a4a;
+    color: black;
 }
 
 .drone-info-header h3 {
@@ -137,7 +138,7 @@
 }
 
 .info-label {
-    color: #7a8a9a;
+    color: #e7e9eb;
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -182,7 +183,7 @@
     height: 100%;
     cursor: crosshair;
 }
-/* Фон карты оставь на контейнере */
+
 .map-container {
     background-image: url('../../img/map.png');
     background-size: cover;
