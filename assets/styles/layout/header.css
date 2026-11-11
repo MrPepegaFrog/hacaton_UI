@@ -1,0 +1,13 @@
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--background);
+    height: 50px;
+    padding: 0 50px;
+}
+header ul{
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+}
