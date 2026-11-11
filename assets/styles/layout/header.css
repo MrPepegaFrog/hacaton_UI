@@ -1,5 +1,13 @@
+body {
+    padding-top: 64px;
+}
+
 .site-header {
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+
     z-index: 1000;
 
     display: flex;
@@ -7,7 +15,7 @@
     justify-content: space-between;
 
     width: 100%;
-    min-height: 64px;
+    min-height: 60px;
     padding: 0 40px;
 
     box-sizing: border-box;
@@ -133,6 +141,7 @@
         font-size: 17px;
     }
 }
+
 @media (max-width: 760px) {
 
     .site-header {
@@ -145,29 +154,30 @@
     }
 
     .menu-toggle {
-    display: flex;
+        display: flex;
 
-    position: fixed;
-    top: 9px;
-    right: 16px;
+        position: absolute;
+        top: 50%;
+        right: 16px;
+        transform: translateY(-50%);
 
-    z-index: 1003;
+        z-index: 1003;
 
-    width: 42px;
-    height: 42px;
-    padding: 9px;
+        width: 42px;
+        height: 42px;
+        padding: 9px;
 
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
 
-    background: var(--bg-secondary, #151f29);
-    border: 1px solid var(--border-color, #2b3946);
-    border-radius: 6px;
+        background: var(--bg-secondary, #151f29);
+        border: 1px solid var(--border-color, #2b3946);
+        border-radius: 6px;
 
-    cursor: pointer;
-}
+        cursor: pointer;
+    }
 
     .header-nav {
         display: none;

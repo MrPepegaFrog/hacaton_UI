@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="assets/styles/main.css">
 </head>
+
 <body>
 
     <div id="header-placeholder"></div>
@@ -80,10 +81,9 @@
             </div>
 
             <div class="map-container" id="mapContainer">
-
-                <canvas
-                    id="mapCanvas"
-                    aria-label="Оперативная карта с расположением беспилотников и очагов пожара"
+                <!-- Реальное изображение карты с сервера -->
+                <img id="map-image" class="map-background" alt="Оперативная карта">
+                <canvas id="mapCanvas" aria-label="Оперативная карта с расположением беспилотников и очагов пожара"
                     role="img">
                 </canvas>
 
@@ -118,11 +118,7 @@
                             <h3 id="infoTitle">Беспилотник</h3>
                         </div>
 
-                        <button
-                            class="close-btn"
-                            id="closeDroneInfo"
-                            type="button"
-                            aria-label="Закрыть">×</button>
+                        <button class="close-btn" id="closeDroneInfo" type="button" aria-label="Закрыть">×</button>
                     </div>
 
                     <div class="drone-identity">
@@ -163,12 +159,13 @@
 
                 </aside>
 
-                <!-- Управление картой -->
+                Управление картой
                 <div class="map-controls">
                     <button id="zoomIn" type="button" aria-label="Увеличить">+</button>
                     <button id="zoomOut" type="button" aria-label="Уменьшить">−</button>
                     <button id="recenterMap" type="button" aria-label="Центрировать">◎</button>
                 </div>
+            
 
             </div>
         </section>
@@ -249,7 +246,9 @@
 
 
     <script src="assets/scripts/layout.js" defer></script>
+    <script src="assets/scripts/telemetry.js" defer></script>
     <script src="assets/scripts/map.js" defer></script>
 
 </body>
+
 </html>

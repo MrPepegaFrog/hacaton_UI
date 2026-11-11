@@ -1,7 +1,6 @@
 @import "base/reset.css";
 @import "base/variables.css";
 
-@import "layout/footer.css";
 @import "layout/header.css";
 
 @import "pages/broadcast.css";
