@@ -119,45 +119,40 @@
     <footer></footer>
 
     <script>
+        const img = document.getElementById('stream_camera1');
+        const ws = new WebSocket('ws://192.168.0.115:3000/video?role=viewer');
 
-     //
-     const img = document.getElementById('stream_camera1');
+        ws.binaryType = 'arraybuffer';
 
-// Если фронтенд открыт с другого порта, используйте явно:
-// const ws = new WebSocket('ws://localhost:3000/video?role=viewer');
-const ws = new WebSocket('ws://192.168.0.115:3000/video?role=viewer');
+        let previousObjectUrl = null;
 
-ws.binaryType = 'arraybuffer';
+        ws.onopen = () => {
+            console.log('Connected to drone camera stream');
+        };
 
-let previousObjectUrl = null;
+        ws.onmessage = (event) => {
+            const blob = new Blob([event.data], { type: 'image/jpeg' });
+            const objectUrl = URL.createObjectURL(blob);
 
-ws.onopen = () => {
-    console.log('Connected to drone camera stream');
-};
+            img.onload = () => {
+                if (previousObjectUrl) {
+                    URL.revokeObjectURL(previousObjectUrl);
+                }
+                previousObjectUrl = objectUrl;
+            };
 
-ws.onmessage = (event) => {
-    const blob = new Blob([event.data], { type: 'image/jpeg' });
-    const objectUrl = URL.createObjectURL(blob);
+            img.src = objectUrl;
+        };
 
-    img.onload = () => {
-        if (previousObjectUrl) {
-            URL.revokeObjectURL(previousObjectUrl);
-        }
-        previousObjectUrl = objectUrl;
-    };
+        ws.onerror = (error) => {
+            console.error('WebSocket error', error);
+        };
 
-    img.src = objectUrl;
-};
+        ws.onclose = () => {
+            console.log('WebSocket closed');
+        };
 
-ws.onerror = (error) => {
-    console.error('WebSocket error', error);
-};
-
-ws.onclose = () => {
-    console.log('WebSocket closed');
-};
-
-     //
+        //
 
 
         const camerasData = [

@@ -1,10 +1,5 @@
 
 "use strict";
-
-/* =========================================
-   WILDFIRE OPS — INCIDENT JOURNAL
-========================================= */
-
 const incidents = [
     {
         id: "INC-1003",
@@ -117,10 +112,6 @@ const incidents = [
 ];
 
 
-/* =========================================
-   DOM
-========================================= */
-
 const tableBody = document.querySelector("#incidentsTableBody");
 
 const searchInput = document.querySelector("#searchInput");
@@ -150,9 +141,6 @@ if (
 
     let filteredIncidents = [];
 
-    /* =========================================
-       ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-    ========================================= */
 
     function createCell(value) {
         const cell = document.createElement("td");
@@ -203,9 +191,6 @@ if (
             new Date().toLocaleTimeString("ru-RU");
     }
 
-    /* =========================================
-       СОЗДАНИЕ СТРОКИ
-    ========================================= */
 
     function createIncidentRow(item) {
         const row = document.createElement("tr");
@@ -269,17 +254,12 @@ if (
             )
         );
 
-        // Площадь
         row.appendChild(
             createCell(item.area.toFixed(2))
         );
 
         return row;
     }
-
-    /* =========================================
-       ФИЛЬТРАЦИЯ
-    ========================================= */
 
     function getFilteredIncidents() {
         const query = searchInput.value
@@ -318,10 +298,6 @@ if (
         });
     }
 
-    /* =========================================
-       ОТРИСОВКА
-    ========================================= */
-
     function renderIncidents() {
         filteredIncidents = getFilteredIncidents();
 
@@ -340,9 +316,6 @@ if (
         updateTimestamp();
     }
 
-    /* =========================================
-       СОБЫТИЯ ФИЛЬТРОВ
-    ========================================= */
 
     searchInput.addEventListener("input", renderIncidents);
 
@@ -354,17 +327,9 @@ if (
 
     dateFilter.addEventListener("change", renderIncidents);
 
-    /* =========================================
-       ОБНОВЛЕНИЕ
-    ========================================= */
-
     refreshBtn.addEventListener("click", function () {
         renderIncidents();
     });
-
-    /* =========================================
-       ЭКСПОРТ CSV
-    ========================================= */
 
     function escapeCSV(value) {
         const text = String(value == null ? "" : value);
@@ -412,8 +377,6 @@ if (
             [csv],
             { type: "text/csv;charset=utf-8;" }
         );
-
-        // Поддержка старых версий Microsoft Edge / IE
         if (navigator.msSaveBlob) {
             navigator.msSaveBlob(blob, "journal-incidents.csv");
             return;
@@ -443,9 +406,6 @@ if (
 
     exportBtn.addEventListener("click", exportCSV);
 
-    /* =========================================
-       ЗАПУСК
-    ========================================= */
 
     renderIncidents();
 

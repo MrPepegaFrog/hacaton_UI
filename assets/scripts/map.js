@@ -1,8 +1,4 @@
 
-/* =========================================
-   WILDFIRE OPS — MAP CONTROLLER
-   ========================================= */
-
 (() => {
     'use strict';
 
@@ -76,10 +72,6 @@
     const reducedMotion = window.matchMedia &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* =====================================
-       CANVAS RESIZE
-       ===================================== */
-
     function resizeCanvas() {
         const rect = mapContainer.getBoundingClientRect();
 
@@ -112,10 +104,6 @@
     }
 
     resizeCanvas();
-
-    /* =====================================
-       COORDINATES AND ZOOM
-       ===================================== */
 
     function worldToScreen(x, z) {
         const normalizedX =
@@ -159,9 +147,6 @@
         draw();
     });
 
-    /* =====================================
-       DRONE POSITION
-       ===================================== */
 
     function updatePosition() {
         const target = worldToScreen(droneData.x, droneData.z);
@@ -198,9 +183,6 @@
         drawHeading += difference * TURN_SMOOTHING;
     }
 
-    /* =====================================
-       DRAW DRONE
-       ===================================== */
 
     function drawDrone() {
         const size = DRONE_SIZE;
@@ -336,10 +318,6 @@
 
     closeDroneInfo?.addEventListener('click', closeInfo);
 
-    /* =====================================
-       CANVAS CLICK
-       ===================================== */
-
     canvas.addEventListener('click', (event) => {
         const rect = canvas.getBoundingClientRect();
 
@@ -372,9 +350,6 @@
         canvas.classList.toggle('drone-hover', distance < 25);
     });
 
-    /* =====================================
-       MAP DRAWING
-       ===================================== */
 
     function draw() {
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -391,9 +366,6 @@
         }
     }
 
-    /* =====================================
-       DEMO TELEMETRY
-       ===================================== */
 
     function updateMockData() {
         time += 0.02;
@@ -425,9 +397,6 @@
         }
     }
 
-    /* =====================================
-       START
-       ===================================== */
 
     drawX = canvasWidth / 2;
     drawY = canvasHeight / 2;
@@ -440,7 +409,6 @@
 
     mockTimer = window.setInterval(updateMockData, 100);
 
-    // Очистка при выгрузке страницы
     window.addEventListener('pagehide', () => {
         if (animationFrame) {
             cancelAnimationFrame(animationFrame);

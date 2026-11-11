@@ -1,10 +1,5 @@
 "use strict";
 
-/* =====================================
-   WILDFIRE OPS — CAMERA MONITORING
-===================================== */
-
-/* Данные камер */
 
 const camerasData = [
     {
@@ -46,9 +41,7 @@ const camerasData = [
 ];
 
 
-/* =====================================
-   DOM ELEMENTS
-===================================== */
+
 
 const cameraContainer = document.getElementById("cameraContainer");
 
@@ -64,10 +57,6 @@ const layouts = [
     "TreeXTree"
 ];
 
-
-/* =====================================
-   CAMERA LAYOUT
-===================================== */
 
 function setCameraLayout(layout, activeButton) {
 
@@ -97,7 +86,6 @@ function setCameraLayout(layout, activeButton) {
 }
 
 
-/* Обработчики переключения сетки */
 
 viewButtons.forEach((button, index) => {
 
@@ -115,11 +103,6 @@ viewButtons.forEach((button, index) => {
 });
 
 
-/* =====================================
-   CAMERA DATA
-===================================== */
-
-/* Безопасное обновление текста */
 
 function setText(elementId, value) {
 
@@ -130,8 +113,6 @@ function setText(elementId, value) {
     element.textContent = value;
 }
 
-
-/* Обновление информации о камерах */
 
 function updateCamerasData() {
 
@@ -161,11 +142,6 @@ function updateCamerasData() {
     });
 
 }
-
-
-/* =====================================
-   BATTERY STATUS
-===================================== */
 
 function updateBatteryStatus(cameraNumber, batteryText) {
 
@@ -199,11 +175,6 @@ function updateBatteryStatus(cameraNumber, batteryText) {
 
     batteryElement.style.borderLeftColor = statusColor;
 }
-
-
-/* =====================================
-   INITIALIZATION
-===================================== */
 
 function initBroadcast() {
 
