@@ -8,7 +8,7 @@ p{
 .view {
     display: flex;
     align-items: center;
-    justify-content: start;
+    justify-content: center;
     background: #111820;
     padding: 2vh 5vw;
     border-bottom: rgba(240, 248, 255, 0.5) solid 0.1vh;
@@ -461,4 +461,47 @@ main {
 .camera {
     position: relative;
     overflow: hidden;
+}
+
+
+main {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+
+.camers {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.camers.window .camera {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.camers.TwoXTwo,
+.camers.TreeXTree {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.camera {
+    box-sizing: border-box;
+}
+
+.camers.TwoXTwo,
+.camers.TreeXTree {
+    justify-content: center;
+    justify-items: center;
+}
+
+.camers.TwoXTwo .camera,
+.camers.TreeXTree .camera {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
