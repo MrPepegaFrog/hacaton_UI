@@ -8,16 +8,61 @@
     <link rel="stylesheet" href="../styles/pages/journal.css">
 </head>
 <body>
+<header>
+    <div class="header-div">
 
+    </div>
+</header>
 <main class="main">
     <section class="panel">
         <div class="panel-div">
-            <h1>ИНЦИДЕНТЫ</h1>
+            <h1 class="panel-h1">ИНЦИДЕНТЫ</h1>
             <button class="export-button" id="exportBtn">Экспорт CSV</button>
+            <button class="icon-button" title="Обновить" id="refreshBtn">↻</button>
+        </div>
+
+        <div class="filters">
+            <input id="searchInput" class="search" type="search" placeholder="Поиск">
+            <select id="statusFilter" aria-label="Фильтр по статусу">
+                <option value="">Все: статус</option>
+                <option>Новый</option>
+                <option>Подтверждён</option>
+                <option>Потушен</option>
+                <option>Ложное срабатывание</option>
+            </select>
+            <select id="typeFilter" aria-label="Фильтр по типу">
+                <option value="">Все: тип</option>
+                <option>Пожар</option>
+                <option>Дым</option>
+            </select>
+            <select id="droneFilter" aria-label="Фильтр по борту">
+                <option value="">Все: борт</option>
+                <option>SC-02</option><option>SC-03</option><option>SC-05</option>
+                <option>SC-06</option><option>SC-08</option><option>SC-09</option>
+                <option>FF-01</option><option>FF-04</option><option>FF-07</option>
+            </select>
+            <input id="dateFilter" class="date-filter" type="date" value="2026-11-11" aria-label="Дата">
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th><th>СТАТУС</th><th>ТИП</th><th>ОБНАРУЖЕН</th>
+                    <th>AI</th><th>БОРТ</th><th>ТУШИТЕЛЬ</th><th>КООРДИНАТЫ</th><th>ГА</th>
+                </tr>
+                </thead>
+                <tbody id="incidentsTableBody">
+                </tbody>
+            </table>
+            <div id="emptyState" class="empty-state" hidden>По заданным фильтрам инциденты не найдены</div>
+        </div>
+        <div class="panel-footer">
+            <span><span class="online-dot"></span> Данные обновляются автоматически</span>
+            <span>Последнее обновление: <b id="lastUpdated">только что</b></span>
         </div>
     </section>
-
-
+    <script src="../pages/journal.js"></script>
 </main>
 
 </body>
