@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>камеры</title>
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+<body>
+<header></header>
+<main>
+    <div class="view">
+        <div class="view_icon" id="window">
+            <p>Окном</p>
+        </div>
+        <div class="view_icon" id="TwoXTwo">
+            <p>2x2</p>
+        </div>
+        <div class="view_icon" id="TreeXTree">
+            <p>3x3</p>
+        </div>
+    </div>
+
+    <div class="camers" id="cameraContainer">
+        <div class="camera" id="camera1"></div>
+        <div class="camera" id="camera2"></div>
+        <div class="camera" id="camera3"></div>
+        <div class="camera" id="camera4"></div>
+    </div>
+</main>
+<footer></footer>
+
+<script>
+    const btn_win = document.getElementById('window');
+    const btn_TwoXTwo = document.getElementById('TwoXTwo');
+    const btn_TreeXTree = document.getElementById('TreeXTree');
+    const container = document.getElementById('cameraContainer');
+
+
+    btn_win.addEventListener('click', () => {
+        container.className = 'camers window';
+    });
+
+    btn_TwoXTwo.addEventListener('click', () => {
+        container.className = 'camers TwoXTwo';
+    });
+
+    btn_TreeXTree.addEventListener('click', () => {
+        container.className = 'camers TreeXTree';
+    });
+</script>
+</body>
+</html>
