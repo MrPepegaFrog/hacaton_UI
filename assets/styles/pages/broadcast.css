@@ -2,7 +2,9 @@ body {
     background: #111820;
     margin: 0;
 }
-
+p{
+    color: #dfdfdf;
+}
 .view {
     display: flex;
     align-items: center;
@@ -42,6 +44,7 @@ body {
     height: 80vh;
     transition: width 0.3s ease, height 0.3s ease;
     margin-bottom: 3vh;
+    border-radius: 0.5vw;
 }
 
 .camers.window .camera {
@@ -58,4 +61,8 @@ body {
 .camers.TreeXTree .camera {
     width: 28.5vw;
     height: 30vh;
+}
+.view_icon.active {
+    background-color: #62A1D6;
+    color: #dfdfdf;
 }

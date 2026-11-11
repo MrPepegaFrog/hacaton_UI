@@ -10,7 +10,7 @@
 <div id="header-placeholder"></div>
 <main>
     <div class="view">
-        <div class="view_icon" id="window">
+        <div class="view_icon active" id="window">
             <p>Окном</p>
         </div>
         <div class="view_icon" id="TwoXTwo">
@@ -36,17 +36,26 @@
     const btn_TreeXTree = document.getElementById('TreeXTree');
     const container = document.getElementById('cameraContainer');
 
+    const buttons = [btn_win, btn_TwoXTwo, btn_TreeXTree];
+
+    function setActiveButton(activeBtn) {
+        buttons.forEach(btn => btn.classList.remove('active'));
+        activeBtn.classList.add('active');
+    }
 
     btn_win.addEventListener('click', () => {
         container.className = 'camers window';
+        setActiveButton(btn_win);
     });
 
     btn_TwoXTwo.addEventListener('click', () => {
         container.className = 'camers TwoXTwo';
+        setActiveButton(btn_TwoXTwo);
     });
 
     btn_TreeXTree.addEventListener('click', () => {
         container.className = 'camers TreeXTree';
+        setActiveButton(btn_TreeXTree);
     });
 </script>
 <script src="../scripts/layout.js"></script>

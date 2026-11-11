@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>камеры</title>
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+<body>
+<header></header>
+<main>
+   <div class="login_conteiner">
+       <div class="login">
+           <form id="loginForm">
+               <div class="main_text"><h1>Авторизация</h1></div>
+               <label for="Login">Введите логин</label>
+               <input type="text" placeholder="Логин" id="Login">
+               <label for="Password">Введите логин</label>
+               <input type="password" placeholder="Пароль" id="Password">
+               <button type="submit">Войти</button>
+           </form>
+       </div>
+   </div>
+</main>
+<footer></footer>
+
+<script>
+    const correctLogin = "admin";
+    const correctPassword = "123";
+
+    const form = document.getElementById("loginForm");
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const userLogin = document.getElementById("Login").value;
+        const userPassword = document.getElementById("Password").value;
+        if (userLogin === correctLogin && userPassword === correctPassword) {
+            window.location.href = "primary.html";
+        } else {
+            alert("Неверный логин или пароль!");
+        }
+    });
+</script>
+</body>
+</html>
