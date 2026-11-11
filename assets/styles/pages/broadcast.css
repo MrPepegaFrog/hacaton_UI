@@ -259,7 +259,6 @@ main {
 /* Заглушка до подключения видеопотока */
 
 .camera::after {
-    content: "ОЖИДАНИЕ ВИДЕОПОТОКА";
     position: absolute;
     top: 50%;
     left: 50%;
