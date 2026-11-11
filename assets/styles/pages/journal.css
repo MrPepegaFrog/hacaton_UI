@@ -176,3 +176,619 @@ tr:hover {
     color: #ffffff;
     background: rgb(55 55 55 / 0.62);
 }
+
+/* =========================================
+   WILDFIRE OPS — INCIDENT JOURNAL
+   Адаптивность и кроссбраузерность
+========================================= */
+
+.main {
+    width: 100%;
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 32px 24px 24px;
+}
+
+.panel {
+    width: 100%;
+    min-width: 0;
+    min-height: calc(100vh - 112px);
+    overflow: hidden;
+    background: var(--bg-panel, #1b2733);
+    border: 1px solid var(--border-color, #2b3946);
+    border-radius: 10px;
+}
+
+/* Заголовок */
+
+.panel-div {
+    min-height: 62px;
+    gap: 16px;
+    padding: 14px 18px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-color, #2b3946);
+}
+
+.panel-h1 {
+    color: var(--text-primary, #edf2f5);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Кнопки */
+
+.container-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.export-button,
+.icon-button {
+    min-height: 36px;
+    border: 1px solid var(--border-light, #354554);
+    border-radius: 6px;
+    color: var(--text-primary, #edf2f5);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 160ms ease,
+                border-color 160ms ease,
+                transform 160ms ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.export-button {
+    width: auto;
+    min-width: 125px;
+    padding: 0 14px;
+    background: #263b4e;
+}
+
+.icon-button {
+    width: 38px;
+    height: 36px;
+    padding: 0;
+    background: var(--bg-secondary, #151f29);
+    font-size: 22px;
+    line-height: 1;
+}
+
+.export-button:hover,
+.icon-button:hover {
+    background: var(--bg-panel-hover, #22313e);
+    border-color: var(--accent-primary, #d49b4b);
+}
+
+.export-button:active,
+.icon-button:active {
+    transform: scale(0.96);
+}
+
+/* Фильтры */
+
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-color, #2b3946);
+}
+
+.filters input,
+.filters select {
+    min-width: 140px;
+    max-width: 100%;
+    min-height: 36px;
+    padding: 8px 10px;
+    background-color: var(--bg-input, #111b24);
+    color: var(--text-primary, #edf2f5);
+    border: 1px solid var(--border-color, #2b3946);
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.filters .search {
+    flex: 1 1 190px;
+    min-width: 160px;
+}
+
+.filters input:focus,
+.filters select:focus {
+    border-color: var(--accent-primary, #d49b4b);
+    box-shadow: 0 0 0 2px rgba(212, 155, 75, 0.12);
+}
+
+.filters input::placeholder {
+    color: var(--text-muted, #71808d);
+}
+
+/* Таблица */
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #405263 #111b24;
+}
+
+.table-wrap table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.table-wrap th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 13px 12px;
+    background: #172432;
+    color: var(--text-secondary, #a5b1bb);
+    border-bottom: 1px solid var(--border-color, #2b3946);
+    text-align: left;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.table-wrap td {
+    padding: 12px;
+    color: var(--text-primary, #edf2f5);
+    border-bottom: 1px solid var(--border-color, #2b3946);
+    white-space: nowrap;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.table-wrap tbody tr {
+    transition: background-color 120ms ease;
+}
+
+.table-wrap tbody tr:hover {
+    background: var(--bg-panel-hover, #22313e);
+}
+
+.table-wrap tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Статусы */
+
+.status,
+.incident-type {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 23px;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-new {
+    color: #fa7777;
+    background: rgba(246, 59, 59, 0.14);
+}
+
+.status-confirmed {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.14);
+}
+
+.status-extinguished {
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.14);
+}
+
+.status-false {
+    color: #6da5ff;
+    background: rgba(48, 124, 255, 0.14);
+}
+
+/* Тип инцидента */
+
+.type-fire {
+    color: #ff7770;
+    background: rgba(255, 75, 65, 0.14);
+}
+
+.type-smoke {
+    color: #c5cdd5;
+    background: rgba(130, 145, 160, 0.16);
+}
+
+/* AI */
+
+.ai-score {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.ai-high {
+    color: #4ade80;
+}
+
+.ai-medium {
+    color: #fbbf24;
+}
+
+.ai-low {
+    color: #f87171;
+}
+
+/* Пустой результат */
+
+.empty-state {
+    padding: 36px 16px;
+    color: var(--text-muted, #71808d);
+    text-align: center;
+    font-size: 13px;
+}
+
+.empty-state[hidden] {
+    display: none;
+}
+
+/* Нижняя панель */
+
+.panel-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 52px;
+    padding: 12px 18px;
+    color: var(--text-muted, #71808d);
+    border-top: 1px solid var(--border-color, #2b3946);
+    font-size: 11px;
+    flex-wrap: wrap;
+}
+
+.panel-footer b {
+    color: var(--text-secondary, #a5b1bb);
+    font-weight: 600;
+}
+
+.online-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: #4caf83;
+    vertical-align: middle;
+    box-shadow: 0 0 7px rgba(76, 175, 131, 0.45);
+}
+
+/* Клавиатурная навигация */
+
+.export-button:focus-visible,
+.icon-button:focus-visible,
+.filters input:focus-visible,
+.filters select:focus-visible {
+    outline: 2px solid var(--accent-primary, #d49b4b);
+    outline-offset: 2px;
+}
+
+/* Планшеты */
+
+@media (max-width: 900px) {
+    .main {
+        padding: 24px 14px 18px;
+    }
+
+    .filters {
+        gap: 8px;
+    }
+
+    .filters input,
+    .filters select {
+        flex: 1 1 150px;
+    }
+
+    .filters .search {
+        flex: 1 1 100%;
+    }
+}
+
+/* Телефоны */
+
+@media (max-width: 600px) {
+    .main {
+        padding: 14px 8px;
+    }
+
+    .panel {
+        min-height: calc(100vh - 100px);
+        border-radius: 8px;
+    }
+
+    .panel-div {
+        align-items: flex-start;
+        padding: 13px;
+    }
+
+    .panel-h1 {
+        font-size: 16px;
+    }
+
+    .container-btn {
+        width: 100%;
+    }
+
+    .export-button {
+        flex: 1;
+    }
+
+    .filters {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .filters input,
+    .filters select,
+    .filters .search {
+        width: 100%;
+        min-width: 0;
+        min-height: 38px;
+        font-size: 11px;
+    }
+
+    .filters .search {
+        grid-column: 1 / -1;
+    }
+
+    .table-wrap table {
+        min-width: 900px;
+    }
+
+    .panel-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px;
+        gap: 8px;
+    }
+}
+
+/* Очень маленькие экраны */
+
+@media (max-width: 360px) {
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .filters .search {
+        grid-column: auto;
+    }
+
+    .panel-div {
+        gap: 10px;
+    }
+
+    .panel-h1 {
+        font-size: 14px;
+    }
+}
+
+/* Учитываем системную настройку уменьшения анимации */
+
+@media (prefers-reduced-motion: reduce) {
+    .export-button,
+    .icon-button,
+    .table-wrap tbody tr {
+        transition: none;
+    }
+}
+
+/* =========================================
+   АДАПТИВНАЯ ТАБЛИЦА ИНЦИДЕНТОВ
+========================================= */
+
+@media (max-width: 960px) {
+
+    .table-wrap {
+        width: 100%;
+        overflow: visible;
+        padding: 10px;
+    }
+
+    .table-wrap table {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    /* Заголовки таблицы скрываем */
+    .table-wrap thead {
+        display: none;
+    }
+
+    /* Каждая строка становится карточкой */
+    .table-wrap tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .table-wrap tbody tr {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        width: 100%;
+        padding: 8px 12px;
+        background: #151f29;
+        border: 1px solid #2b3946;
+        border-radius: 8px;
+    }
+
+    .table-wrap tbody tr:hover {
+        background: #1b2936;
+    }
+
+    /* Ячейки карточки */
+    .table-wrap tbody td {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 0;
+        padding: 10px 5px;
+        border-bottom: 1px solid #263340;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        font-size: 12px;
+    }
+
+    /* Подписи к значениям */
+    .table-wrap tbody td::before {
+        display: block;
+        margin-bottom: 6px;
+        color: #71808d;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .table-wrap tbody td:nth-child(1)::before {
+        content: "ID ИНЦИДЕНТА";
+    }
+
+    .table-wrap tbody td:nth-child(2)::before {
+        content: "СТАТУС";
+    }
+
+    .table-wrap tbody td:nth-child(3)::before {
+        content: "ТИП";
+    }
+
+    .table-wrap tbody td:nth-child(4)::before {
+        content: "ОБНАРУЖЕН";
+    }
+
+    .table-wrap tbody td:nth-child(5)::before {
+        content: "AI АНАЛИЗ";
+    }
+
+    .table-wrap tbody td:nth-child(6)::before {
+        content: "БОРТ";
+    }
+
+    .table-wrap tbody td:nth-child(7)::before {
+        content: "ТУШИТЕЛЬ";
+    }
+
+    .table-wrap tbody td:nth-child(8)::before {
+        content: "КООРДИНАТЫ";
+    }
+
+    .table-wrap tbody td:nth-child(9)::before {
+        content: "ПЛОЩАДЬ, ГА";
+    }
+
+    /* ID на всю ширину карточки */
+    .table-wrap tbody td:first-child {
+        grid-column: 1 / -1;
+        color: #e4b45e;
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    /* Координаты на всю ширину */
+    .table-wrap tbody td:nth-child(8) {
+        grid-column: 1 / -1;
+    }
+
+    /* Последняя строка без нижней границы */
+    .table-wrap tbody td:last-child {
+        border-bottom: none;
+    }
+
+    /* Статусы не растягиваем */
+    .table-wrap .status,
+    .table-wrap .incident-type {
+        align-self: flex-start;
+        max-width: 100%;
+    }
+}
+
+/* Узкие телефоны */
+@media (max-width: 360px) {
+
+    .table-wrap {
+        padding: 7px;
+    }
+
+    .table-wrap tbody tr {
+        padding: 6px 9px;
+    }
+
+    .table-wrap tbody td {
+        padding: 9px 4px;
+        font-size: 11px;
+    }
+
+    .table-wrap tbody td::before {
+        font-size: 8px;
+    }
+}
+
+/* Выпадающие списки фильтров */
+
+.filters select {
+    min-width: 150px;
+    padding: 8px 36px 8px 12px;
+    background-color: #111b24;
+    color: #edf2f5;
+    border: 1px solid #354554;
+    border-radius: 6px;
+    cursor: pointer;
+
+    /* Убираем стандартную стрелку */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    /* Своя стрелка */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a5b1bb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+}
+
+.filters select:focus {
+    outline: none;
+    border-color: #d49b4b;
+}
+
+.filters select option {
+    background: #151f29;
+    color: #edf2f5;
+}
+
+/* На телефоне */
+@media (max-width: 600px) {
+    .filters select {
+        width: 100%;
+        min-width: 0;
+        padding-right: 32px;
+        background-position: right 10px center;
+    }
+}

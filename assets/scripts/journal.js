@@ -1,4 +1,10 @@
 
+"use strict";
+
+/* =========================================
+   WILDFIRE OPS — INCIDENT JOURNAL
+========================================= */
+
 const incidents = [
     {
         id: "INC-1003",
@@ -97,7 +103,7 @@ const incidents = [
         area: 1.20
     },
     {
-        id: "INC-1005",
+        id: "INC-1009",
         status: "Ложное срабатывание",
         type: "Пожар",
         date: "2026-11-12T01:48:55",
@@ -110,6 +116,10 @@ const incidents = [
     }
 ];
 
+
+/* =========================================
+   DOM
+========================================= */
 
 const tableBody = document.querySelector("#incidentsTableBody");
 
@@ -124,165 +134,320 @@ const refreshBtn = document.querySelector("#refreshBtn");
 const exportBtn = document.querySelector("#exportBtn");
 const lastUpdated = document.querySelector("#lastUpdated");
 
+if (
+    !tableBody ||
+    !searchInput ||
+    !statusFilter ||
+    !typeFilter ||
+    !droneFilter ||
+    !dateFilter ||
+    !emptyState ||
+    !refreshBtn ||
+    !exportBtn
+) {
+    console.error("Не найдены необходимые элементы журнала.");
+} else {
 
-function getStatusClass(status) {
-    switch (status) {
-        case "Новый":
-            return "status-new";
+    let filteredIncidents = [];
 
-        case "Подтверждён":
-            return "status-confirmed";
+    /* =========================================
+       ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    ========================================= */
 
-        case "Потушен":
-            return "status-extinguished";
-
-        case "Ложное срабатывание":
-            return "status-false";
-
-        default:
-            return "";
+    function createCell(value) {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        return cell;
     }
-}
 
+    function getStatusClass(status) {
+        switch (status) {
+            case "Новый":
+                return "status-new";
 
-function renderIncidents() {
+            case "Подтверждён":
+                return "status-confirmed";
 
-    const query = searchInput.value.trim().toLowerCase();
-    const status = statusFilter.value;
-    const type = typeFilter.value;
-    const drone = droneFilter.value;
-    const date = dateFilter.value;
+            case "Потушен":
+                return "status-extinguished";
 
-    const filtered = incidents.filter(item => {
+            case "Ложное срабатывание":
+                return "status-false";
 
-        const searchable = Object.values(item)
-            .join(" ")
-            .toLowerCase();
+            default:
+                return "";
+        }
+    }
 
-        const itemDate = item.date.slice(0, 10);
+    function getAIClass(score) {
+        if (score >= 85) return "ai-high";
+        if (score >= 70) return "ai-medium";
 
-        return searchable.includes(query)
-            && (!status || item.status === status)
-            && (!type || item.type === type)
-            && (!drone || item.drone === drone)
-            && (!date || itemDate === date);
-    });
+        return "ai-low";
+    }
 
-    tableBody.innerHTML = "";
+    function formatDate(date) {
+        const parsedDate = new Date(date);
 
-    filtered.forEach(item => {
+        if (Number.isNaN(parsedDate.getTime())) {
+            return "—";
+        }
 
+        return parsedDate.toLocaleString("ru-RU");
+    }
+
+    function updateTimestamp() {
+        if (!lastUpdated) return;
+
+        lastUpdated.textContent =
+            new Date().toLocaleTimeString("ru-RU");
+    }
+
+    /* =========================================
+       СОЗДАНИЕ СТРОКИ
+    ========================================= */
+
+    function createIncidentRow(item) {
         const row = document.createElement("tr");
 
-        row.innerHTML = `
-            <td>${item.id}</td>
+        row.appendChild(createCell(item.id));
 
-            <td>
-                <span class="status ${getStatusClass(item.status)}">
-                    ${item.status}
-                </span>
-            </td>
+        // Статус
+        const statusCell = document.createElement("td");
+        const statusBadge = document.createElement("span");
 
-            <td>
-                <span class="incident-type ${item.type === "Пожар" ? "type-fire" : "type-smoke"}">
-                    ${item.type === "Пожар" ? "Пожар" : "Дым"}
-                </span>
-            </td>
+        statusBadge.className =
+            "status " + getStatusClass(item.status);
 
-            <td>
-                ${new Date(item.date).toLocaleString("ru-RU")}
-            </td>
+        statusBadge.textContent = item.status;
 
-            <td>
-                <span class="ai-score ${item.ai >= 85 ? "ai-high" : item.ai >= 70 ? "ai-medium" : "ai-low"}">
-                    ${item.ai}%
-                </span>
-            </td>
+        statusCell.appendChild(statusBadge);
+        row.appendChild(statusCell);
 
-            <td>${item.drone}</td>
+        // Тип инцидента
+        const typeCell = document.createElement("td");
+        const typeBadge = document.createElement("span");
 
-            <td>${item.extinguisher ?? "—"}</td>
+        typeBadge.className =
+            "incident-type " +
+            (item.type === "Пожар" ? "type-fire" : "type-smoke");
 
-            <td>
-                ${item.latitude.toFixed(4)},
-                ${item.longitude.toFixed(4)}
-            </td>
+        typeBadge.textContent = item.type;
 
-            <td>${item.area.toFixed(2)}</td>
-        `;
+        typeCell.appendChild(typeBadge);
+        row.appendChild(typeCell);
 
-        tableBody.appendChild(row);
+        // Дата
+        row.appendChild(createCell(formatDate(item.date)));
+
+        // AI
+        const aiCell = document.createElement("td");
+        const aiScore = document.createElement("span");
+
+        aiScore.className =
+            "ai-score " + getAIClass(item.ai);
+
+        aiScore.textContent = item.ai + "%";
+
+        aiCell.appendChild(aiScore);
+        row.appendChild(aiCell);
+
+        // Борт
+        row.appendChild(createCell(item.drone));
+
+        // Тушитель
+        row.appendChild(
+            createCell(item.extinguisher || "—")
+        );
+
+        // Координаты
+        row.appendChild(
+            createCell(
+                item.latitude.toFixed(4) +
+                ", " +
+                item.longitude.toFixed(4)
+            )
+        );
+
+        // Площадь
+        row.appendChild(
+            createCell(item.area.toFixed(2))
+        );
+
+        return row;
+    }
+
+    /* =========================================
+       ФИЛЬТРАЦИЯ
+    ========================================= */
+
+    function getFilteredIncidents() {
+        const query = searchInput.value
+            .trim()
+            .toLocaleLowerCase("ru-RU");
+
+        const status = statusFilter.value;
+        const type = typeFilter.value;
+        const drone = droneFilter.value;
+        const date = dateFilter.value;
+
+        return incidents.filter(function (item) {
+
+            const searchable = [
+                item.id,
+                item.status,
+                item.type,
+                item.date,
+                item.ai,
+                item.drone,
+                item.extinguisher || "",
+                item.latitude,
+                item.longitude,
+                item.area
+            ].join(" ").toLocaleLowerCase("ru-RU");
+
+            const itemDate = item.date.slice(0, 10);
+
+            return (
+                searchable.includes(query) &&
+                (!status || item.status === status) &&
+                (!type || item.type === type) &&
+                (!drone || item.drone === drone) &&
+                (!date || itemDate === date)
+            );
+        });
+    }
+
+    /* =========================================
+       ОТРИСОВКА
+    ========================================= */
+
+    function renderIncidents() {
+        filteredIncidents = getFilteredIncidents();
+
+        tableBody.textContent = "";
+
+        const fragment = document.createDocumentFragment();
+
+        filteredIncidents.forEach(function (item) {
+            fragment.appendChild(createIncidentRow(item));
+        });
+
+        tableBody.appendChild(fragment);
+
+        emptyState.hidden = filteredIncidents.length !== 0;
+
+        updateTimestamp();
+    }
+
+    /* =========================================
+       СОБЫТИЯ ФИЛЬТРОВ
+    ========================================= */
+
+    searchInput.addEventListener("input", renderIncidents);
+
+    statusFilter.addEventListener("change", renderIncidents);
+
+    typeFilter.addEventListener("change", renderIncidents);
+
+    droneFilter.addEventListener("change", renderIncidents);
+
+    dateFilter.addEventListener("change", renderIncidents);
+
+    /* =========================================
+       ОБНОВЛЕНИЕ
+    ========================================= */
+
+    refreshBtn.addEventListener("click", function () {
+        renderIncidents();
     });
 
-    emptyState.hidden = filtered.length !== 0;
-}
+    /* =========================================
+       ЭКСПОРТ CSV
+    ========================================= */
 
+    function escapeCSV(value) {
+        const text = String(value == null ? "" : value);
 
-searchInput.addEventListener("input", renderIncidents);
-statusFilter.addEventListener("change", renderIncidents);
-typeFilter.addEventListener("change", renderIncidents);
-droneFilter.addEventListener("change", renderIncidents);
-dateFilter.addEventListener("change", renderIncidents);
+        return '"' + text.replace(/"/g, '""') + '"';
+    }
 
+    function exportCSV() {
+        const header = [
+            "ID",
+            "Статус",
+            "Тип",
+            "Обнаружен",
+            "AI",
+            "Борт",
+            "Тушитель",
+            "Широта",
+            "Долгота",
+            "Площадь, га"
+        ];
 
-refreshBtn.addEventListener("click", () => {
+        const rows = filteredIncidents.map(function (item) {
+            return [
+                item.id,
+                item.status,
+                item.type,
+                formatDate(item.date),
+                item.ai + "%",
+                item.drone,
+                item.extinguisher || "—",
+                item.latitude.toFixed(4),
+                item.longitude.toFixed(4),
+                item.area.toFixed(2)
+            ];
+        });
 
-    searchInput.value = "";
-    statusFilter.value = "";
-    typeFilter.value = "";
-    droneFilter.value = "";
-    dateFilter.value = "";
+        const csv = "\uFEFF" + [
+            header,
+            ...rows
+        ].map(function (row) {
+            return row.map(escapeCSV).join(";");
+        }).join("\r\n");
+
+        const blob = new Blob(
+            [csv],
+            { type: "text/csv;charset=utf-8;" }
+        );
+
+        // Поддержка старых версий Microsoft Edge / IE
+        if (navigator.msSaveBlob) {
+            navigator.msSaveBlob(blob, "journal-incidents.csv");
+            return;
+        }
+
+        if (!window.URL || !URL.createObjectURL) {
+            console.error("Экспорт файлов не поддерживается браузером.");
+            return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "journal-incidents.csv";
+        link.style.display = "none";
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Не освобождаем URL до завершения скачивания
+        window.setTimeout(function () {
+            URL.revokeObjectURL(url);
+        }, 1000);
+    }
+
+    exportBtn.addEventListener("click", exportCSV);
+
+    /* =========================================
+       ЗАПУСК
+    ========================================= */
 
     renderIncidents();
 
-    lastUpdated.textContent =
-        new Date().toLocaleTimeString("ru-RU");
-});
-
-
-exportBtn.addEventListener("click", () => {
-
-    const header = [
-        "ID",
-        "Статус",
-        "Тип",
-        "Обнаружен",
-        "AI",
-        "Борт",
-        "Тушитель",
-        "Координаты",
-        "ГА"
-    ];
-
-    const visibleRows = [
-        ...tableBody.querySelectorAll("tr")
-    ].map(row => {
-
-        return [...row.children]
-            .map(cell =>
-                `"${cell.innerText.replaceAll('"', '""')}"`
-            )
-            .join(";");
-    });
-
-    const csv = "\uFEFF" +
-        [header.join(";"), ...visibleRows].join("\r\n");
-
-    const blob = new Blob([csv], {
-        type: "text/csv;charset=utf-8;"
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "journal-incidents.csv";
-    link.click();
-
-    URL.revokeObjectURL(url);
-});
-
-renderIncidents();
-
-console.log("Журнал инцидентов загружен!");
+    console.log("WILDFIRE OPS: журнал инцидентов загружен.");
+}
