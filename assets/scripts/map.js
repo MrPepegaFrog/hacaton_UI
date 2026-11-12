@@ -1,10 +1,14 @@
+
 (() => {
     'use strict';
 
+    // =====================================
+    // НАСТРОЙКИ
+    // =====================================
 
     const DRONE_SIZE = 18;
 
-    // Координаты Unity в диапазоне 0..1
+    // Координаты Unity
     const MAP_BOUNDS = {
         minX: 0,
         maxX: 1,
@@ -14,12 +18,20 @@
 
     const SMOOTHING = 0.045;
     const TURN_SMOOTHING = 0.08;
+
     const MAX_ROUTE_POINTS = 500;
 
     const MIN_ZOOM = 0.5;
     const MAX_ZOOM = 5;
     const ZOOM_STEP = 1.2;
 
+    // Настройки следования за дроном
+    const FOLLOW_MARGIN = 0.22;
+    const FOLLOW_SPEED = 0.12;
+
+    // =====================================
+    // DOM
+    // =====================================
 
     const canvas = document.getElementById('mapCanvas');
     const mapContainer = document.getElementById('mapContainer');
@@ -53,11 +65,14 @@
     const metricBattery = document.getElementById('metricBattery');
     const lastUpdated = document.getElementById('lastUpdated');
 
-    // Кнопки карты
+    // Кнопки
     const zoomInBtn = document.getElementById('zoomIn');
     const zoomOutBtn = document.getElementById('zoomOut');
     const recenterMapBtn = document.getElementById('recenterMap');
 
+    // =====================================
+    // ДАННЫЕ
+    // =====================================
 
     const droneData = {
         id: '—',
@@ -72,33 +87,58 @@
 
     const routePoints = [];
 
+    let telemetryConnected = false;
+
+    // =====================================
+    // РАЗМЕРЫ CANVAS И КАРТЫ
+    // =====================================
+
     let canvasWidth = 0;
     let canvasHeight = 0;
     let pixelRatio = 1;
 
-    // Реальные размеры изображения карты в пикселях
     let mapWidth = 0;
     let mapHeight = 0;
     let mapLoaded = false;
 
-    // Положение и масштаб карты
+    // =====================================
+    // ПОЛОЖЕНИЕ И МАСШТАБ КАРТЫ
+    // =====================================
+
     let zoom = 1;
     let panX = 0;
     let panY = 0;
 
-    // Перетаскивание
+    // =====================================
+    // ПЕРЕТАСКИВАНИЕ
+    // =====================================
+
     let isPanning = false;
+
     let pointerStartX = 0;
     let pointerStartY = 0;
+
     let startPanX = 0;
     let startPanY = 0;
+
     let dragMoved = false;
     let suppressClick = false;
 
-    // Положение дрона в координатах самой карты
+    // После ручного перемещения ждём новую телеметрию,
+    // прежде чем снова включать автоматическое следование.
+    let followPaused = false;
+
+    // =====================================
+    // ПОЛОЖЕНИЕ И НАПРАВЛЕНИЕ ДРОНА
+    // =====================================
+
     let drawX = 0;
     let drawY = 0;
+
     let drawHeading = 0;
+    let targetHeading = 0;
+
+    let hasMovementHeading = false;
 
     let selected = false;
     let animationFrame = null;
@@ -107,6 +147,9 @@
         window.matchMedia &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    // =====================================
+    // ЗАГРУЗКА ИЗОБРАЖЕНИЯ
+    // =====================================
 
     function calculateMapSize() {
         if (
@@ -117,8 +160,6 @@
             return false;
         }
 
-        // Важно: берём исходные размеры изображения.
-        // Здесь нет привязки к размерам Canvas.
         mapWidth = mapImage.naturalWidth;
         mapHeight = mapImage.naturalHeight;
 
@@ -127,18 +168,24 @@
         return true;
     }
 
+    // =====================================
+    // ЦЕНТРИРОВАНИЕ КАРТЫ
+    // =====================================
+
     function centerMap() {
         if (!mapLoaded) return;
 
-        // Исходный масштаб 1:1
         zoom = 1;
 
-        // Центрируем изображение относительно окна Canvas
         panX = (canvasWidth - mapWidth) / 2;
         panY = (canvasHeight - mapHeight) / 2;
 
         draw();
     }
+
+    // =====================================
+    // ИЗМЕНЕНИЕ РАЗМЕРА CANVAS
+    // =====================================
 
     function resizeCanvas() {
         const rect = mapContainer.getBoundingClientRect();
@@ -160,8 +207,6 @@
         ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
         if (mapLoaded && oldWidth > 0 && oldHeight > 0) {
-            // Сохраняем точку карты, которая была в центре окна,
-            // чтобы изменение размера окна не сдвигало изображение.
             const oldCenterMapX =
                 (oldWidth / 2 - panX) / zoom;
 
@@ -179,6 +224,9 @@
         draw();
     }
 
+    // =====================================
+    // КООРДИНАТЫ UNITY -> КАРТА
+    // =====================================
 
     function worldToMap(x, z) {
         const normalizedX =
@@ -195,21 +243,84 @@
         };
     }
 
+    // =====================================
+    // ОБНОВЛЕНИЕ ПОЗИЦИИ И ПОВОРОТА ДРОНА
+    // =====================================
+
     function updateDronePosition() {
         if (!droneData.hasTelemetry || !mapLoaded) return;
 
-        const position = worldToMap(droneData.x, droneData.z);
+        const position = worldToMap(
+            droneData.x,
+            droneData.z
+        );
+
+        // Сглаживаем поворот по кратчайшему углу
+        const angleDifference = Math.atan2(
+            Math.sin(targetHeading - drawHeading),
+            Math.cos(targetHeading - drawHeading)
+        );
 
         if (reducedMotion) {
             drawX = position.x;
             drawY = position.y;
+            drawHeading = targetHeading;
             return;
         }
 
+        drawHeading += angleDifference * TURN_SMOOTHING;
+
+        // Сглаживаем движение
         drawX += (position.x - drawX) * SMOOTHING;
         drawY += (position.y - drawY) * SMOOTHING;
     }
 
+    // =====================================
+    // СЛЕДОВАНИЕ КАРТЫ ЗА ДРОНОМ
+    // =====================================
+
+    function followDrone() {
+        if (
+            !mapLoaded ||
+            !droneData.hasTelemetry ||
+            isPanning ||
+            followPaused
+        ) {
+            return;
+        }
+
+        // Текущая позиция дрона на экране
+        const screenX = panX + drawX * zoom;
+        const screenY = panY + drawY * zoom;
+
+        // Безопасная зона от краёв Canvas
+        const marginX = canvasWidth * FOLLOW_MARGIN;
+        const marginY = canvasHeight * FOLLOW_MARGIN;
+
+        const leftLimit = marginX;
+        const rightLimit = canvasWidth - marginX;
+
+        const topLimit = marginY;
+        const bottomLimit = canvasHeight - marginY;
+
+        // Следование по горизонтали
+        if (screenX < leftLimit) {
+            panX += (leftLimit - screenX) * FOLLOW_SPEED;
+        } else if (screenX > rightLimit) {
+            panX -= (screenX - rightLimit) * FOLLOW_SPEED;
+        }
+
+        // Следование по вертикали
+        if (screenY < topLimit) {
+            panY += (topLimit - screenY) * FOLLOW_SPEED;
+        } else if (screenY > bottomLimit) {
+            panY -= (screenY - bottomLimit) * FOLLOW_SPEED;
+        }
+    }
+
+    // =====================================
+    // МАСШТАБИРОВАНИЕ
+    // =====================================
 
     function applyZoom(newZoom, focalX, focalY) {
         const oldZoom = zoom;
@@ -221,7 +332,6 @@
 
         const factor = zoom / oldZoom;
 
-        // Точка под курсором остаётся на том же месте
         panX = focalX - (focalX - panX) * factor;
         panY = focalY - (focalY - panY) * factor;
 
@@ -249,10 +359,14 @@
     });
 
     recenterMapBtn?.addEventListener('click', () => {
+        followPaused = false;
         centerMap();
     });
 
-    // Колёсико мыши
+    // =====================================
+    // КОЛЁСИКО МЫШИ
+    // =====================================
+
     mapContainer.addEventListener('wheel', event => {
         event.preventDefault();
 
@@ -268,6 +382,9 @@
         applyZoom(newZoom, mouseX, mouseY);
     }, { passive: false });
 
+    // =====================================
+    // РУЧНОЕ ПЕРЕТАСКИВАНИЕ
+    // =====================================
 
     canvas.addEventListener('pointerdown', event => {
         if (event.button !== 0) return;
@@ -283,6 +400,7 @@
         startPanY = panY;
 
         canvas.setPointerCapture(event.pointerId);
+
         canvas.style.cursor = 'grabbing';
     });
 
@@ -292,8 +410,15 @@
         const deltaX = event.clientX - pointerStartX;
         const deltaY = event.clientY - pointerStartY;
 
-        if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
+        if (
+            Math.abs(deltaX) > 3 ||
+            Math.abs(deltaY) > 3
+        ) {
             dragMoved = true;
+        }
+
+        if (dragMoved) {
+            followPaused = true;
         }
 
         panX = startPanX + deltaX;
@@ -306,6 +431,7 @@
         if (!isPanning) return;
 
         isPanning = false;
+
         suppressClick = dragMoved;
 
         canvas.style.cursor = 'grab';
@@ -315,6 +441,9 @@
     canvas.addEventListener('pointercancel', stopPanning);
     canvas.addEventListener('lostpointercapture', stopPanning);
 
+    // =====================================
+    // ПОЛУЧЕНИЕ ТЕЛЕМЕТРИИ
+    // =====================================
 
     window.addEventListener('telemetry:update', event => {
         const data = event.detail;
@@ -324,10 +453,57 @@
             !Number.isFinite(data.position.x) ||
             !Number.isFinite(data.position.z)
         ) {
-            console.warn('Некорректные координаты телеметрии:', data);
+            console.warn(
+                'Некорректные координаты телеметрии:',
+                data
+            );
             return;
         }
 
+        const nextX = data.position.x;
+        const nextZ = data.position.z;
+
+        // Предыдущие координаты
+        const deltaX = nextX - droneData.x;
+        const deltaZ = nextZ - droneData.z;
+
+        // Определяем направление по движению Unity.
+        // Учитываем реальные пропорции изображения карты.
+        if (
+            droneData.hasTelemetry &&
+            Math.hypot(deltaX, deltaZ) > 0.0001
+        ) {
+            const mapDeltaX = deltaX * (
+                mapLoaded ? mapWidth : 1
+            );
+
+            const mapDeltaZ = deltaZ * (
+                mapLoaded ? mapHeight : 1
+            );
+
+            // Стрелка изначально смотрит вверх (+Z).
+            targetHeading = Math.atan2(
+                mapDeltaX,
+                mapDeltaZ
+            );
+
+            if (!hasMovementHeading) {
+                drawHeading = targetHeading;
+                hasMovementHeading = true;
+            }
+        } else if (
+            !droneData.hasTelemetry &&
+            Number.isFinite(data.heading)
+        ) {
+            // Начальное направление из Unity
+            targetHeading = data.heading * Math.PI / 180;
+            drawHeading = targetHeading;
+        }
+
+        droneData.x = nextX;
+        droneData.z = nextZ;
+
+        // Имя и ID
         if (data.droneId !== undefined && data.droneId !== null) {
             droneData.id = String(data.droneId);
         }
@@ -338,9 +514,7 @@
             droneData.name = droneData.id;
         }
 
-        droneData.x = data.position.x;
-        droneData.z = data.position.z;
-
+        // Батарея
         if (Number.isFinite(data.battery)) {
             droneData.battery = data.battery;
 
@@ -356,19 +530,25 @@
         droneData.status = 'active';
         droneData.hasTelemetry = true;
 
-        // Запоминаем маршрут в координатах Unity
+        // После ручного перемещения ждём новую телеметрию
+        // и затем снова включаем автоматическое следование.
+        if (!isPanning) {
+            followPaused = false;
+        }
+
+        // Сохраняем маршрут
         const lastPoint = routePoints[routePoints.length - 1];
 
         if (
             !lastPoint ||
             Math.hypot(
-                data.position.x - lastPoint.x,
-                data.position.z - lastPoint.z
+                nextX - lastPoint.x,
+                nextZ - lastPoint.z
             ) > 0.01
         ) {
             routePoints.push({
-                x: data.position.x,
-                z: data.position.z
+                x: nextX,
+                z: nextZ
             });
 
             if (routePoints.length > MAX_ROUTE_POINTS) {
@@ -391,8 +571,14 @@
         }
     });
 
+    // =====================================
+    // СТАТУС СОЕДИНЕНИЯ
+    // =====================================
+
     window.addEventListener('telemetry:status', event => {
-        telemetryConnected = Boolean(event.detail?.connected);
+        telemetryConnected = Boolean(
+            event.detail?.connected
+        );
 
         if (!telemetryConnected && !droneData.hasTelemetry) {
             droneData.status = 'waiting';
@@ -403,6 +589,9 @@
         }
     });
 
+    // =====================================
+    // ОТРИСОВКА МАРШРУТА
+    // =====================================
 
     function drawRoute() {
         if (!mapLoaded || routePoints.length < 2) return;
@@ -412,7 +601,10 @@
         ctx.beginPath();
 
         routePoints.forEach((point, index) => {
-            const position = worldToMap(point.x, point.z);
+            const position = worldToMap(
+                point.x,
+                point.z
+            );
 
             if (index === 0) {
                 ctx.moveTo(position.x, position.y);
@@ -423,14 +615,23 @@
 
         ctx.strokeStyle = 'rgba(212, 155, 75, 0.85)';
         ctx.lineWidth = 2 / zoom;
-        ctx.setLineDash([6 / zoom, 5 / zoom]);
+
+        ctx.setLineDash([
+            6 / zoom,
+            5 / zoom
+        ]);
+
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
+
         ctx.stroke();
 
         ctx.restore();
     }
 
+    // =====================================
+    // ОТРИСОВКА ДРОНА
+    // =====================================
 
     function drawDrone() {
         if (!droneData.hasTelemetry) return;
@@ -440,27 +641,54 @@
         ctx.save();
 
         ctx.translate(drawX, drawY);
-        ctx.rotate(droneData.heading * Math.PI / 180);
+
+        // Поворот по направлению движения
+        ctx.rotate(drawHeading);
 
         if (selected) {
             ctx.beginPath();
-            ctx.arc(0, 0, 30, 0, Math.PI * 2);
+
+            ctx.arc(
+                0,
+                0,
+                30,
+                0,
+                Math.PI * 2
+            );
+
             ctx.fillStyle = 'rgba(212, 155, 75, 0.15)';
             ctx.fill();
         }
 
-        ctx.fillStyle = selected ? '#d49b4b' : '#17232c';
+        ctx.fillStyle = selected
+            ? '#d49b4b'
+            : '#17232c';
+
         ctx.strokeStyle = '#f1bd69';
         ctx.lineWidth = 2 / zoom;
 
-        ctx.fillRect(-size, -size, size * 2, size * 2);
-        ctx.strokeRect(-size, -size, size * 2, size * 2);
+        ctx.fillRect(
+            -size,
+            -size,
+            size * 2,
+            size * 2
+        );
 
+        ctx.strokeRect(
+            -size,
+            -size,
+            size * 2,
+            size * 2
+        );
+
+        // Стрелка направления
         ctx.beginPath();
+
         ctx.moveTo(0, -12);
         ctx.lineTo(8, 7);
         ctx.lineTo(0, 3);
         ctx.lineTo(-8, 7);
+
         ctx.closePath();
 
         ctx.fillStyle = '#ffffff';
@@ -469,7 +697,9 @@
         ctx.strokeStyle = '#d49b4b';
         ctx.lineWidth = 2 / zoom;
 
+        // Угловые элементы
         ctx.beginPath();
+
         ctx.moveTo(-size, -size);
         ctx.lineTo(-size - 7, -size - 7);
 
@@ -486,11 +716,12 @@
 
         ctx.restore();
 
-        // Подпись дрона
+        // Подпись
         ctx.save();
 
         ctx.fillStyle = '#edf2f5';
         ctx.font = `${12 / zoom}px Arial, sans-serif`;
+
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
 
@@ -503,26 +734,52 @@
         ctx.restore();
     }
 
-    function draw() {
-        // Очищаем именно область Canvas
-        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    // =====================================
+    // ОСНОВНАЯ ОТРИСОВКА
+    // =====================================
 
-        // Если изображение ещё не пришло — показываем фон
+    function draw() {
+        ctx.setTransform(
+            pixelRatio,
+            0,
+            0,
+            pixelRatio,
+            0,
+            0
+        );
+
+        ctx.clearRect(
+            0,
+            0,
+            canvasWidth,
+            canvasHeight
+        );
+
         if (!mapLoaded) {
             ctx.fillStyle = '#0f1720';
-            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            ctx.fillRect(
+                0,
+                0,
+                canvasWidth,
+                canvasHeight
+            );
+
             return;
         }
 
+        // Сначала обновляем положение дрона
+        updateDronePosition();
+
+        // Затем перемещаем карту вслед за ним
+        followDrone();
+
         ctx.save();
 
-        // Перемещение и масштабирование карты
         ctx.translate(panX, panY);
         ctx.scale(zoom, zoom);
 
-        // Рисуем изображение строго в его исходном размере.
-        // Никакого растягивания под Canvas.
+        // Изображение сохраняет исходный размер
         ctx.drawImage(
             mapImage,
             0,
@@ -531,10 +788,10 @@
             mapHeight
         );
 
-        updateDronePosition();
-
+        // Маршрут
         drawRoute();
 
+        // Дрон
         if (droneData.hasTelemetry) {
             drawDrone();
         }
@@ -542,15 +799,31 @@
         ctx.restore();
     }
 
+    // =====================================
+    // КООРДИНАТЫ КУРСОРА НА КАРТЕ
+    // =====================================
 
     function getPointerMapPosition(event) {
         const rect = canvas.getBoundingClientRect();
 
         return {
-            x: (event.clientX - rect.left - panX) / zoom,
-            y: (event.clientY - rect.top - panY) / zoom
+            x: (
+                event.clientX -
+                rect.left -
+                panX
+            ) / zoom,
+
+            y: (
+                event.clientY -
+                rect.top -
+                panY
+            ) / zoom
         };
     }
+
+    // =====================================
+    // ВЫБОР ДРОНА НА КАРТЕ
+    // =====================================
 
     canvas.addEventListener('click', event => {
         if (suppressClick) {
@@ -574,6 +847,7 @@
         }
     });
 
+    // Курсор при наведении на дрон
     canvas.addEventListener('pointermove', event => {
         if (isPanning || !droneData.hasTelemetry) return;
 
@@ -590,6 +864,9 @@
         );
     });
 
+    // =====================================
+    // КАРТОЧКА ИНФОРМАЦИИ О ДРОНЕ
+    // =====================================
 
     function updateDroneInfo() {
         if (!droneInfo || !droneData.hasTelemetry) return;
@@ -624,8 +901,16 @@
 
         if (batteryLevel) {
             batteryLevel.style.width = `${battery}%`;
-            batteryLevel.classList.toggle('warning', battery <= 50);
-            batteryLevel.classList.toggle('danger', battery <= 20);
+
+            batteryLevel.classList.toggle(
+                'warning',
+                battery <= 50
+            );
+
+            batteryLevel.classList.toggle(
+                'danger',
+                battery <= 20
+            );
         }
 
         if (infoCoordX) {
@@ -662,7 +947,7 @@
     closeDroneInfo?.addEventListener('click', closeInfo);
 
     // =====================================
-    // ЗАГРУЗКА ИЗОБРАЖЕНИЯ
+    // СОБЫТИЯ ИЗОБРАЖЕНИЯ
     // =====================================
 
     mapImage.addEventListener('load', () => {
@@ -671,8 +956,6 @@
 
         if (!calculateMapSize()) return;
 
-        // При первой загрузке или смене размеров изображения
-        // центрируем карту в исходном масштабе.
         if (
             oldWidth !== mapWidth ||
             oldHeight !== mapHeight
@@ -684,24 +967,41 @@
     });
 
     mapImage.addEventListener('error', () => {
-        console.error('Не удалось загрузить изображение карты');
+        console.error(
+            'Не удалось загрузить изображение карты'
+        );
     });
 
+    // =====================================
+    // ИЗМЕНЕНИЕ РАЗМЕРА ОКНА
+    // =====================================
+
     if ('ResizeObserver' in window) {
-        const resizeObserver = new ResizeObserver(resizeCanvas);
+        const resizeObserver = new ResizeObserver(
+            resizeCanvas
+        );
+
         resizeObserver.observe(mapContainer);
     } else {
         window.addEventListener('resize', resizeCanvas);
     }
 
+    // =====================================
+    // АНИМАЦИЯ
+    // =====================================
+
     function animate() {
         draw();
+
         animationFrame = requestAnimationFrame(animate);
     }
 
+    // =====================================
+    // ИНИЦИАЛИЗАЦИЯ
+    // =====================================
+
     resizeCanvas();
 
-    // Если изображение уже загружено
     if (calculateMapSize()) {
         centerMap();
     }
@@ -719,4 +1019,5 @@
     });
 
     console.log('Карта инициализирована');
+
 })();
