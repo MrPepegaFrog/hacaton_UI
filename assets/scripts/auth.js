@@ -28,10 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // =====================================
-    // РЕГИСТРАЦИЯ
-    // =====================================
-
     const registerForm = document.getElementById("registerForm");
 
     if (registerForm) {

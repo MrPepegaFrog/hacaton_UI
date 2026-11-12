@@ -1,9 +1,6 @@
 (() => {
     'use strict';
 
-    // =====================================
-    // НАСТРОЙКИ
-    // =====================================
 
     const DRONE_SIZE = 18;
 
@@ -23,9 +20,6 @@
     const MAX_ZOOM = 5;
     const ZOOM_STEP = 1.2;
 
-    // =====================================
-    // ЭЛЕМЕНТЫ DOM
-    // =====================================
 
     const canvas = document.getElementById('mapCanvas');
     const mapContainer = document.getElementById('mapContainer');
@@ -64,9 +58,6 @@
     const zoomOutBtn = document.getElementById('zoomOut');
     const recenterMapBtn = document.getElementById('recenterMap');
 
-    // =====================================
-    // СОСТОЯНИЕ
-    // =====================================
 
     const droneData = {
         id: '—',
@@ -116,9 +107,6 @@
         window.matchMedia &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // =====================================
-    // РАЗМЕРЫ И ЦЕНТРИРОВАНИЕ КАРТЫ
-    // =====================================
 
     function calculateMapSize() {
         if (
@@ -151,10 +139,6 @@
 
         draw();
     }
-
-    // =====================================
-    // РАЗМЕР CANVAS
-    // =====================================
 
     function resizeCanvas() {
         const rect = mapContainer.getBoundingClientRect();
@@ -195,9 +179,6 @@
         draw();
     }
 
-    // =====================================
-    // КООРДИНАТЫ UNITY -> КООРДИНАТЫ КАРТЫ
-    // =====================================
 
     function worldToMap(x, z) {
         const normalizedX =
@@ -229,9 +210,6 @@
         drawY += (position.y - drawY) * SMOOTHING;
     }
 
-    // =====================================
-    // МАСШТАБИРОВАНИЕ
-    // =====================================
 
     function applyZoom(newZoom, focalX, focalY) {
         const oldZoom = zoom;
@@ -290,9 +268,6 @@
         applyZoom(newZoom, mouseX, mouseY);
     }, { passive: false });
 
-    // =====================================
-    // ПЕРЕТАСКИВАНИЕ КАРТЫ
-    // =====================================
 
     canvas.addEventListener('pointerdown', event => {
         if (event.button !== 0) return;
@@ -340,9 +315,6 @@
     canvas.addEventListener('pointercancel', stopPanning);
     canvas.addEventListener('lostpointercapture', stopPanning);
 
-    // =====================================
-    // ТЕЛЕМЕТРИЯ
-    // =====================================
 
     window.addEventListener('telemetry:update', event => {
         const data = event.detail;
@@ -431,9 +403,6 @@
         }
     });
 
-    // =====================================
-    // ОТРИСОВКА МАРШРУТА
-    // =====================================
 
     function drawRoute() {
         if (!mapLoaded || routePoints.length < 2) return;
@@ -462,9 +431,6 @@
         ctx.restore();
     }
 
-    // =====================================
-    // ОТРИСОВКА ДРОНА
-    // =====================================
 
     function drawDrone() {
         if (!droneData.hasTelemetry) return;
@@ -537,10 +503,6 @@
         ctx.restore();
     }
 
-    // =====================================
-    // ГЛАВНАЯ ОТРИСОВКА
-    // =====================================
-
     function draw() {
         // Очищаем именно область Canvas
         ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
@@ -580,9 +542,6 @@
         ctx.restore();
     }
 
-    // =====================================
-    // ВЫБОР ДРОНА
-    // =====================================
 
     function getPointerMapPosition(event) {
         const rect = canvas.getBoundingClientRect();
@@ -631,9 +590,6 @@
         );
     });
 
-    // =====================================
-    // КАРТОЧКА ДРОНА
-    // =====================================
 
     function updateDroneInfo() {
         if (!droneInfo || !droneData.hasTelemetry) return;
@@ -731,10 +687,6 @@
         console.error('Не удалось загрузить изображение карты');
     });
 
-    // =====================================
-    // ИЗМЕНЕНИЕ РАЗМЕРА ОКНА
-    // =====================================
-
     if ('ResizeObserver' in window) {
         const resizeObserver = new ResizeObserver(resizeCanvas);
         resizeObserver.observe(mapContainer);
@@ -742,18 +694,10 @@
         window.addEventListener('resize', resizeCanvas);
     }
 
-    // =====================================
-    // АНИМАЦИЯ
-    // =====================================
-
     function animate() {
         draw();
         animationFrame = requestAnimationFrame(animate);
     }
-
-    // =====================================
-    // ЗАПУСК
-    // =====================================
 
     resizeCanvas();
 

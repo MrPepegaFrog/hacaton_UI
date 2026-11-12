@@ -1,16 +1,8 @@
 "use strict";
 console.log("BROADCAST.JS: файл загружен");
 (() => {
-    // =====================================
-    // НАСТРОЙКИ
-    // =====================================
 
-    const WS_URL = "ws://192.168.0.115:3000/video?role=viewer";
-
-    // =====================================
-    // ЭЛЕМЕНТЫ СТРАНИЦЫ
-    // =====================================
-
+    const WS_URL = `ws://${SERVER_ADDRESS}/video?role=viewer`;
     const cameraContainer = document.getElementById("cameraContainer");
     const cameraImage = document.getElementById("stream_camera1");
 
@@ -26,9 +18,6 @@ console.log("BROADCAST.JS: файл загружен");
         "TreeXTree"
     ];
 
-    // =====================================
-    // ЗАГЛУШКИ ДЛЯ КАМЕР 2–4
-    // =====================================
 
     const placeholderCameras = [
         {
@@ -63,10 +52,6 @@ console.log("BROADCAST.JS: файл загружен");
         }
     ];
 
-    // =====================================
-    // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-    // =====================================
-
     function setText(elementId, value) {
         const element = document.getElementById(elementId);
 
@@ -97,9 +82,6 @@ console.log("BROADCAST.JS: файл загружен");
         return directions[index];
     }
 
-    // =====================================
-    // РАСКЛАДКА КАМЕР
-    // =====================================
 
     function setCameraLayout(layout, activeButton) {
         if (!cameraContainer || !activeButton) {
@@ -132,10 +114,6 @@ console.log("BROADCAST.JS: файл загружен");
         });
     });
 
-    // =====================================
-    // СТАТУС БАТАРЕИ
-    // =====================================
-
     function updateBatteryStatus(battery) {
         const batteryElement = document.getElementById("buttary_camera1");
 
@@ -155,10 +133,6 @@ console.log("BROADCAST.JS: файл загружен");
 
         batteryElement.style.borderLeftColor = color;
     }
-
-    // =====================================
-    // ЗАГЛУШКИ КАМЕР 2–4
-    // =====================================
 
     function updatePlaceholderCameras() {
         placeholderCameras.forEach(camera => {
@@ -192,10 +166,6 @@ console.log("BROADCAST.JS: файл загружен");
         });
     }
 
-    // =====================================
-    // НАЧАЛЬНОЕ СОСТОЯНИЕ КАМЕРЫ 1
-    // =====================================
-
     function initializeLiveCamera() {
         const coordElement = document.getElementById("coord_camera1");
 
@@ -210,10 +180,6 @@ console.log("BROADCAST.JS: файл загружен");
         setText("buttary_camera1", "Батарея: —");
         setText("ping_camera1", "Пинг: —");
     }
-
-    // =====================================
-    // ОБНОВЛЕНИЕ ДАННЫХ ИЗ UNITY
-    // =====================================
 
     function updateLiveCamera(data) {
         if (!data || !data.position) {
@@ -274,10 +240,6 @@ console.log("BROADCAST.JS: файл загружен");
         }
     }
 
-    // =====================================
-    // ПОЛУЧЕНИЕ ТЕЛЕМЕТРИИ
-    // =====================================
-
     window.addEventListener("telemetry:update", event => {
     const data = event.detail;
 
@@ -298,10 +260,6 @@ console.log("BROADCAST.JS: файл загружен");
             console.warn("BROADCAST: соединение с телеметрией потеряно");
         }
     });
-
-    // =====================================
-    // ВИДЕОПОТОК КАМЕРЫ 1
-    // =====================================
 
     function connectCameraStream() {
         if (!cameraImage) {
@@ -356,9 +314,6 @@ console.log("BROADCAST.JS: файл загружен");
         };
     }
 
-    // =====================================
-    // ЗАПУСК
-    // =====================================
 
     function initBroadcast() {
         if (!cameraContainer) {

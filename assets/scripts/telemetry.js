@@ -1,9 +1,6 @@
 
-const WS_BASE_URL = 'ws://192.168.0.115:3000/video';
+const WS_BASE_URL = `ws://${SERVER_ADDRESS}/video`;
 
-// =====================================
-// ПОДКЛЮЧЕНИЕ К WEBSOCKET
-// =====================================
 
 function connectWebSocket(role) {
     const url = `${WS_BASE_URL}?role=${encodeURIComponent(role)}`;
@@ -13,9 +10,6 @@ function connectWebSocket(role) {
     return new WebSocket(url);
 }
 
-// =====================================
-// ВИДЕОПОТОКИ
-// =====================================
 
 const droneImg = document.getElementById('drone-cam');
 const detectedImg = document.getElementById('detected-cam');
@@ -77,9 +71,6 @@ function wireStream(role, img, urlHolder) {
 wireStream('viewer', droneImg, prevUrl1);
 wireStream('detected-viewer', detectedImg, prevUrl2);
 
-// =====================================
-// ПОТОК ИЗОБРАЖЕНИЯ КАРТЫ
-// =====================================
 
 const mapImg = document.getElementById('map-image');
 let mapUrl = null;
@@ -132,9 +123,6 @@ if (mapImg) {
     console.warn('Элемент map-image не найден');
 }
 
-// =====================================
-// ТЕЛЕМЕТРИЯ ДРОНА
-// =====================================
 
 const telWs = connectWebSocket('telemetry-viewer');
 
